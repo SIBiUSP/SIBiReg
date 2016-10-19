@@ -23,7 +23,7 @@ if((__FILE__ == $_SERVER['SCRIPT_FILENAME']) && !empty($_COOKIE['OA1USPBACKURL']
 
 session_start();
 
-if(!empty(PERFILHOMEBASE) && ( $_SERVER['SCRIPT_NAME'] == PERFILHOMEBASE )){
+if( $_SERVER['SCRIPT_NAME'] == PERFILHOMEBASE ){
 	session_unset();
 	session_destroy();
 } else if(empty($_SESSION['dadosusp'])){
