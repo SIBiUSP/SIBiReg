@@ -1,6 +1,10 @@
 <?php
-$oauthhomebase='/sibireg/perfil-inicio.php';
+
+// phpinfo();
+// exit;
+
 include('oauth.php');
+
 ?>
 <!DOCTYPE html>
 <html>

@@ -16,9 +16,7 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-$oauthhomebase='/sibireg/perfil-inicio.php';
 include('oauth.php');
-
 include_once('config.php');
 
 if (ORCID_PRODUCTION) {

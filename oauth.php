@@ -10,13 +10,10 @@ phpinfo();
 exit;
 */
 
-if(__FILE__ !== $_SERVER['SCRIPT_FILENAME']){
-  if(empty($oauthhomebase)){
-    echo 'definir a variável $oauthhomebase com o caminho de retorno antes de incluir este arquivo.';
-    exit;
-  }
-}
-else if(!empty($_COOKIE['OA1USPBACKURL'])){
+ini_set("display_errors", 1);
+include_once('config.php');
+
+if((__FILE__ == $_SERVER['SCRIPT_FILENAME']) && !empty($_COOKIE['OA1USPBACKURL'])){
   $oa1uspbackurl = $_COOKIE['OA1USPBACKURL'];
   unset($_COOKIE['OA1USPBACKURL']);
   setcookie('OA1USPBACKURL', '', time()-3600, "/", ".sibi.usp.br");
@@ -24,19 +21,13 @@ else if(!empty($_COOKIE['OA1USPBACKURL'])){
   exit;
 }
 
-ini_set("display_errors", 1);
-include_once('config.php');
-
 session_start();
 
-if(!empty($oauthhomebase) && ( $_SERVER['SCRIPT_NAME'] == $oauthhomebase )){
+if(!empty(PERFILHOMEBASE) && ( $_SERVER['SCRIPT_NAME'] == PERFILHOMEBASE )){
 	session_unset();
 	session_destroy();
 } else if(empty($_SESSION['dadosusp'])){
  try {
-
-// echo 'passaqui';
-
 	$req_url = OA1USP_REQUEST_URL;
 	$authurl = OA1USP_AUTHORIZE_URL;
 	$acc_url = OA1USP_ACCESSTOKEN_URL;
@@ -69,7 +60,7 @@ if(!empty($oauthhomebase) && ( $_SERVER['SCRIPT_NAME'] == $oauthhomebase )){
 		exit;
 	} else {
 		unset($_SESSION['dadosusp']);
-		header('Location: $oauthhomebase?erro=tente%20novamente,erro%20de%20autenticacao');
+		header('Location: PERFILHOMEBASE?erro=tente%20novamente,erro%20de%20autenticacao');
 		exit;
 	}
  } catch(OAuthException $E) {
@@ -77,4 +68,3 @@ if(!empty($oauthhomebase) && ( $_SERVER['SCRIPT_NAME'] == $oauthhomebase )){
  }
 }
 
-?>

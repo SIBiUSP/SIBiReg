@@ -5,7 +5,6 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-$oauthhomebase='/sibireg/perfil-inicio.php';
 include('oauth.php');
 include_once('config.php');
 
@@ -64,7 +63,7 @@ oci_close($conn);
     </head>
     <body>
 	<center>
-		<a href="<?=$oauthhomebase?>" title="Sair">
+		<a href="<?=PERFILHOMEBASE?>" title="Sair">
 			<img src="http://www.sibi.usp.br/wp-content/themes/sibi-usp/assets/img/logotipo-sibi-usp.jpg" alt="Logotipo SIBiUSP">
 		</a>
 	</center>
@@ -90,7 +89,7 @@ oci_close($conn);
 		</ul>
 
 		<br>
-		<a href="<?=$oauthhomebase?>">sair</a>
+		<a href="<?=PERFILHOMEBASE?>">sair</a>
 		<br>
 
 	</div>
