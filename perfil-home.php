@@ -54,7 +54,7 @@ oci_close($conn);
 <!DOCTYPE html>
 <html>
     <head>
-        <title></title>
+        <title>Perfil SIBiUSP</title>
         <link rel="stylesheet" href="inc/uikit-2.27.1/css/uikit.min.css" />
         <link rel="stylesheet" href="inc/style.css" />
         <script src="inc/jquery-3.1.1.min.js"></script>
@@ -67,10 +67,8 @@ oci_close($conn);
 			<img src="http://www.sibi.usp.br/wp-content/themes/sibi-usp/assets/img/logotipo-sibi-usp.jpg" alt="Logotipo SIBiUSP">
 		</a>
 	</center>
-	<div class="barrausp">
-
-		<br><br><br>
-
+	<div class="barrausp"><p>&nbsp;<br/>&nbsp;<br/>&nbsp;</p></div>
+    <div class="uk-container uk-container-center uk-margin-large-bottom">
 		<h1>
 		Perfil SIBiUSP
 		</h1>
@@ -90,9 +88,9 @@ oci_close($conn);
 
 		<br>
 		<a href="<?=PERFILHOMEBASE?>">sair</a>
-		<br>
-
-	</div>
+		<br>    
+    </div>
+        
 <?php
 /*
 <pre>

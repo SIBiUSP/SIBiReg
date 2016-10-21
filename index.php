@@ -8,21 +8,21 @@
         <script src="inc/uikit-2.27.1/js/uikit.min.js"></script>
     </head>
     <body>
-	<center>
-		<a href="http://www.sibi.usp.br/" title="Voltar para a página principal">
-			<img src="http://www.sibi.usp.br/wp-content/themes/sibi-usp/assets/img/logotipo-sibi-usp.jpg" alt="Logotipo SIBiUSP">
-		</a>
-	</center>
-	<div class="barrausp">
-		<br><br>
-		<h1>
-		Registro SIBi
-		</h1>
-		<ul>
-		<li> <a href='perfil-home.php'>Perfil SIBi USP</a>
-		<li> Pesquisa USP
-		<li> Listagens - Dedalus
-		</ul>
-	</div>
+        <center>
+            <a href="http://www.sibi.usp.br/" title="Voltar para a página principal">
+                <img src="http://www.sibi.usp.br/wp-content/themes/sibi-usp/assets/img/logotipo-sibi-usp.jpg" alt="Logotipo SIBiUSP">
+            </a>
+        </center>
+        <div class="barrausp"><p>&nbsp;<br/>&nbsp;<br/>&nbsp;</p></div>
+        <div class="uk-container uk-container-center uk-margin-large-bottom">    		
+            <h1>
+            Registro SIBi
+            </h1>
+            <ul>
+            <li> <a href='perfil-home.php'>Perfil SIBi USP</a>
+            <li> Pesquisa USP
+            <li> Listagens - Dedalus
+            </ul>
+        </div>
     </body>
 </html>
