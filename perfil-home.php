@@ -5,6 +5,7 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
+$HOMEBASE = '/sibireg/perfil-inicio.php';
 include('oauth.php');
 include_once('config.php');
 
@@ -87,7 +88,7 @@ oci_close($conn);
 		</ul>
 
 		<br>
-		<a href="<?=PERFILHOMEBASE?>">sair</a>
+		<a href="<?=$HOMEBASE?>">sair</a>
 		<br>    
     </div>
         

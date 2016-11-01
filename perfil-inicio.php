@@ -3,6 +3,7 @@
 // phpinfo();
 // exit;
 
+$HOMEBASE = '/sibireg/perfil-inicio.php';
 include('oauth.php');
 
 ?>

@@ -1,15 +1,4 @@
 <?php
-
-/*
-session_start();
-echo "\n<pre>\n";
-print_r("olha:[".print_r($_SESSION)."]ok");
-echo __FILE__;
-echo "\n</pre><hr>\n";
-phpinfo();
-exit;
-*/
-
 ini_set("display_errors", 1);
 include_once('config.php');
 
@@ -23,7 +12,7 @@ if((__FILE__ == $_SERVER['SCRIPT_FILENAME']) && !empty($_COOKIE['OA1USPBACKURL']
 
 session_start();
 
-if( $_SERVER['SCRIPT_NAME'] == PERFILHOMEBASE ){
+if( $_SERVER['SCRIPT_NAME'] == $HOMEBASE ){
 	session_unset();
 	session_destroy();
 } else if(empty($_SESSION['dadosusp'])){
@@ -60,7 +49,7 @@ if( $_SERVER['SCRIPT_NAME'] == PERFILHOMEBASE ){
 		exit;
 	} else {
 		unset($_SESSION['dadosusp']);
-		header('Location: PERFILHOMEBASE?erro=tente%20novamente,erro%20de%20autenticacao');
+		header('Location: '.$HOMEBASE.'?erro=tente%20novamente,erro%20de%20autenticacao');
 		exit;
 	}
  } catch(OAuthException $E) {
