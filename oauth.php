@@ -12,7 +12,7 @@ if((__FILE__ == $_SERVER['SCRIPT_FILENAME']) && !empty($_COOKIE['OA1USPBACKURL']
 
 session_start();
 
-if( $_SERVER['SCRIPT_NAME'] == $HOMEBASE ){
+if( $_SERVER['SCRIPT_NAME'] == dirname($_SERVER['SCRIPT_NAME']).'/'.$HOMEBASE ){
 	session_unset();
 	session_destroy();
 } else if(empty($_SESSION['dadosusp'])){
@@ -37,7 +37,7 @@ if( $_SERVER['SCRIPT_NAME'] == $HOMEBASE ){
 		}
 		header('Location: '.$targeturl);
 		exit;
-	} else if(!empty($_SESSION['redirecto'])) {
+	} else if(!empty($_SESSION['redirecto']) && !empty($_GET['oauth_token'])) {
 		$oauth->setToken($_GET['oauth_token'],$_SESSION['secret']);
 		$access_token_info = $oauth->getAccessToken($acc_url, NULL, NULL, 'POST');
 		$_SESSION['token'] = $access_token_info['oauth_token'];
@@ -48,8 +48,11 @@ if( $_SERVER['SCRIPT_NAME'] == $HOMEBASE ){
 		header('Location: '.$_SESSION['redirecto']);
 		exit;
 	} else {
+		unset($_SESSION['token']);
+		unset($_SESSION['redirecto']);
+		unset($_SESSION['secret']);
 		unset($_SESSION['dadosusp']);
-		header('Location: '.$HOMEBASE.'?erro=tente%20novamente,erro%20de%20autenticacao');
+		header('Location: '.$HOMEBASE);
 		exit;
 	}
  } catch(OAuthException $E) {

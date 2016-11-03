@@ -3,7 +3,7 @@
 // phpinfo();
 // exit;
 
-$HOMEBASE = '/sibireg/perfil-inicio.php';
+$HOMEBASE = 'perfil-inicio.php';
 include('oauth.php');
 
 ?>
@@ -26,7 +26,7 @@ include('oauth.php');
         <div class="uk-container uk-container-center uk-margin-large-bottom">    
 
             <h1>
-            Registro SIBi
+            Perfil SIBi
             </h1>
             <br>
 
