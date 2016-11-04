@@ -3,8 +3,8 @@
 // phpinfo();
 // exit;
 
-$HOMEBASE = 'perfil-inicio.php';
-include('oauth.php');
+// $HOMEBASE = 'perfil-inicio.php';
+// include('saml.php');
 
 ?>
 <!DOCTYPE html>
@@ -23,7 +23,7 @@ include('oauth.php');
             </a>
         </center>
         <div class="barrausp"><p>&nbsp;<br/>&nbsp;<br/>&nbsp;</p></div>
-        <div class="uk-container uk-container-center uk-margin-large-bottom">    
+        <div class="uk-container uk-container-center uk-margin-large-bottom">
 
             <h1>
             Perfil SIBi
@@ -31,7 +31,7 @@ include('oauth.php');
             <br>
 
             <ul>
-             <li>Acesse aqui e veja ou gerencie seus dados: <a href="perfil-home.php"> Perfil SIBi-USP </a>
+             <li>Acesse aqui e veja ou gerencie seus dados: <a href="perfil-home.php?login=yes"> Perfil SIBi-USP </a>
             </ul>
 
         </div>

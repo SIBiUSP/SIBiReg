@@ -5,8 +5,9 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-$HOMEBASE = 'perfil-inicio.php';
-include('oauth.php');
+session_start();
+$_SESSION['HOMEBASE'] = 'perfil-inicio.php';
+include('saml.php');
 include_once('config.php');
 
 ini_set("display_errors", 1);
@@ -17,7 +18,11 @@ error_reporting(E_ALL);
 putenv("NLS_SORT=BINARY_AI");
 putenv("NLS_COMP=LINGUISTIC");
 
-$pcodpes = intval(trim($_SESSION['dadosusp']->loginUsuario));
+// $pcodpes = intval(trim($_SESSION['dadosusp']->loginUsuario));
+
+if(!empty($_COOKIE['SAMLUSPSIBI_DATA']) && $_COOKIE['SAMLUSPSIBI_DATA']['ONSESS'] == 'yes' ){
+
+$pcodpes = intval(trim($_COOKIE['SAMLUSPSIBI_DATA']['NUSP']));
 
 $conn = oci_connect(DBUSR, DBPWD, DBURL);
 
@@ -64,7 +69,7 @@ oci_close($conn);
     </head>
     <body>
 	<center>
-		<a href="<?=PERFILHOMEBASE?>" title="Sair">
+		<a href="<?=$_SESSION['HOMEBASE']?>" title="Sair">
 			<img src="http://www.sibi.usp.br/wp-content/themes/sibi-usp/assets/img/logotipo-sibi-usp.jpg" alt="Logotipo SIBiUSP">
 		</a>
 	</center>
@@ -75,8 +80,8 @@ oci_close($conn);
 		</h1>
 
 		<ul>
-		  <li>Nome: <?=$_SESSION['dadosusp']->nomeUsuario?></li>
-		  <li>Número USP: <?=$_SESSION['dadosusp']->loginUsuario?></li>
+		  <li>Nome: <?=$_COOKIE['SAMLUSPSIBI_DATA']['NOME']?></li>
+		  <li>Número USP: <?=$_COOKIE['SAMLUSPSIBI_DATA']['NUSP']?></li>
 <?php if(!empty($rperfil['LATTES'])){ ?>
 		  <li>CV Lattes: <a href="http://lattes.cnpq.br/<?=$rperfil['LATTES']?>" target="_blank"><?=$rperfil['LATTES']?></a> (obtido do sistema corporativo) </li>
 <?php } ?>
@@ -88,7 +93,7 @@ oci_close($conn);
 		</ul>
 
 		<br>
-		<a href="<?=$HOMEBASE?>">sair</a>
+		<a href="<?=$_SESSION['HOMEBASE']?>">sair</a>
 		<br>    
     </div>
         
@@ -103,4 +108,8 @@ print_r($rperfil);
 ?>
     </body>
 </html>
-
+<?php
+} else {
+  header('Location: '.$_SESSION['HOMEBASE'].'?logout=yes');
+  exit;
+} ?>
