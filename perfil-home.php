@@ -18,9 +18,7 @@ error_reporting(E_ALL);
 putenv("NLS_SORT=BINARY_AI");
 putenv("NLS_COMP=LINGUISTIC");
 
-// $pcodpes = intval(trim($_SESSION['dadosusp']->loginUsuario));
-
-if(!empty($_COOKIE['SAMLUSPSIBI_DATA']) && $_COOKIE['SAMLUSPSIBI_DATA']['ONSESS'] == 'yes' ){
+if(!empty($_COOKIE['SAMLUSPSIBI_DATA']['NUSP']) && $_COOKIE['SAMLUSPSIBI_DATA']['ONSESS'] == 'yes' ){
 
 $pcodpes = intval(trim($_COOKIE['SAMLUSPSIBI_DATA']['NUSP']));
 
