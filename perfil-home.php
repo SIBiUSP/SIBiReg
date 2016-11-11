@@ -37,7 +37,7 @@ oci_execute($stid);
 oci_commit($conn);
 // CV LATTES [FIM]
 
-$stmt="select kprop, vprop from perfis where autid = :autid order by kprop";
+$stmt="select kprop, iprop, vprop from perfis where autid = :autid order by kprop, iprop";
 
 $stid = oci_parse($conn, $stmt);
 if(!$stid){ exit; }
@@ -48,7 +48,7 @@ oci_execute($stid);
 
 $rperfil = array();
 while($row = oci_fetch_array($stid, OCI_ASSOC+OCI_RETURN_NULLS)){
-  $rperfil[$row['KPROP']] = $row['VPROP'];
+  $rperfil[$row['KPROP']][$row['IPROP']] = $row['VPROP'];
 }
 
 oci_free_statement($stid);
@@ -66,35 +66,38 @@ oci_close($conn);
         <script src="inc/uikit-2.27.1/js/components/lightbox.js"></script>
     </head>
     <body>
-	<center>
-		<a href="<?=$_SESSION['HOMEBASE']?>" title="Sair">
-			<img src="http://www.sibi.usp.br/wp-content/themes/sibi-usp/assets/img/logotipo-sibi-usp.jpg" alt="Logotipo SIBiUSP">
-		</a>
-	</center>
-	<div class="barrausp"><p>&nbsp;<br/>&nbsp;<br/>&nbsp;</p></div>
-    <div class="uk-container uk-container-center uk-margin-large-bottom">
-		<h1>
-		Perfil SIBiUSP
-		</h1>
-
+	<?php include 'inc/header.inc' ?>
+	<h1>
+	Perfil SIBiUSP
+	</h1>
 		<ul>
 		  <li>Nome: <?=$_COOKIE['SAMLUSPSIBI_DATA']['NOME']?></li>
 		  <li>Número USP: <?=$_COOKIE['SAMLUSPSIBI_DATA']['NUSP']?></li>
-<?php if(!empty($rperfil['LATTES'])){ ?>
-		  <li>CV Lattes: <a href="http://lattes.cnpq.br/<?=$rperfil['LATTES']?>" target="_blank"><?=$rperfil['LATTES']?></a> (obtido do sistema corporativo) </li>
-<?php } ?>
-<?php if(empty($rperfil['ORCID'])){ ?>
-		  <li>ORCID: Não obtido (<a href='orcid.php' data-uk-lightbox title="ORCID" >criar ou associar seu ORCID</a>)</li>
-<?php } else { ?>
-		  <li>ORCID: <a href="https://sandbox.orcid.org/<?=$rperfil['ORCID']?>" target="_blank"><?=$rperfil['ORCID']?></a></li>
-<?php } ?>
+<?php
+if(array_key_exists('LATTES',$rperfil)){
+  foreach($rperfil['LATTES'] as $kl => $vl){
+?>
+		  <li>CV Lattes: <a href="http://lattes.cnpq.br/<?=$rperfil['LATTES'][$kl]?>" target="_blank"><?=$rperfil['LATTES'][$kl]?></a> (obtido do sistema corporativo) </li>
+<?php
+  }
+}
+if(array_key_exists('ORCID',$rperfil)){
+	foreach($rperfil['ORCID'] as $ko => $vo){
+?>
+		  <li>ORCID: <a href="https://sandbox.orcid.org/<?=$rperfil['ORCID'][$ko]?>" target="_blank"><?=$rperfil['ORCID'][$ko]?></a></li>
+<?php
+	}
+} else {
+?>
+  <li>ORCID: Não obtido (<a href='orcid.php' data-uk-lightbox title="ORCID" >criar ou associar seu ORCID</a>)</li>
+<?php
+}
+?>
 		</ul>
-
 		<br>
 		<a href="<?=$_SESSION['HOMEBASE']?>">sair</a>
 		<br>    
     </div>
-        
 <?php
 /*
 <pre>

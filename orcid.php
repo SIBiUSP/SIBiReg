@@ -16,7 +16,7 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-include('oauth.php');
+//include('oauth.php');
 include_once('config.php');
 
 if (ORCID_PRODUCTION) {
@@ -69,17 +69,17 @@ putenv("NLS_COMP=LINGUISTIC");
 
 $conn = oci_connect(DBUSR, DBPWD, DBURL);
 
-$sqlqry = "BEGIN perfil_sibi.atualiza_identificador(:pcodpes,:pchave,:pvalor); END;";
+$sqlqry = "BEGIN :rpsres := perfil_sibi.agrega_identificador_orcid(:pcodpes,:pvalor); END;";
 
 $stid = oci_parse($conn, $sqlqry);
 if(!$stid){ exit; }
 
 $pcodpes = intval($_SESSION['dadosusp']->loginUsuario);
-$pchave = 'ORCID';
 $pvalor = $response['orcid'];
+$rpsres = '';
 oci_bind_by_name($stid,':pcodpes',$pcodpes);
-oci_bind_by_name($stid,':pchave',$pchave);
 oci_bind_by_name($stid,':pvalor',$pvalor);
+oci_bind_by_name($stid,':rpsres',$rpsres,2000,SQLT_CHR);
 
 oci_execute($stid,OCI_NO_AUTO_COMMIT);
 
