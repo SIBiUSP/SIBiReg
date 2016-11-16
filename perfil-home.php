@@ -87,9 +87,12 @@ if(array_key_exists('ORCID',$rperfil)){
 		  <li>ORCID: <a href="https://sandbox.orcid.org/<?=$rperfil['ORCID'][$ko]?>" target="_blank"><?=$rperfil['ORCID'][$ko]?></a></li>
 <?php
 	}
+ // <li><a href='orcid.php' title="ORCID" >adicionar outro ORCID</a></li>
+?>
+<?php
 } else {
 ?>
-  <li>ORCID: Não obtido (<a href='orcid.php' data-uk-lightbox title="ORCID" >criar ou associar seu ORCID</a>)</li>
+		  <li>ORCID: Não obtido (<a href='orcid.php' title="ORCID" >criar ou associar seu ORCID</a>)</li><!-- data-uk-lightbox -->
 <?php
 }
 ?>

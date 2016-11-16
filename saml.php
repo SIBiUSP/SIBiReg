@@ -15,7 +15,8 @@ elseif(filter_input(INPUT_GET,'login') == 'yes'){
   header('Location: '.SAMLUSPSIBIURL.'?login=yes');
   exit;
 }
-elseif((__FILE__ !== $_SERVER['SCRIPT_FILENAME']) && (empty($_COOKIE['SAMLUSPSIBI_DATA']) || (filter_input(INPUT_GET,'login') == 'yes') )){
+// elseif((__FILE__ !== $_SERVER['SCRIPT_FILENAME']) && (empty($_COOKIE['SAMLUSPSIBI_DATA']) || (filter_input(INPUT_GET,'login') == 'yes') )){
+elseif((__FILE__ !== $_SERVER['SCRIPT_FILENAME']) && empty($_COOKIE['SAMLUSPSIBI_DATA'])){
   setcookie('SAMLUSPSIBI_DATA[SAMLUSPSIBICURRENTURL]', $_SERVER['SCRIPT_NAME'], 0, "/", ".sibi.usp.br");
   header('Location: '.SAMLUSPSIBIURL);
   exit;
