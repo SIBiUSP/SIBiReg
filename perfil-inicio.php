@@ -19,7 +19,7 @@
     <body>
       <?php include 'inc/header.inc' ?>
             <h1>
-            Perfil SIBi
+            Perfil SIBiUSP
             </h1>
             <br>
 
