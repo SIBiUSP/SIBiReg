@@ -24,6 +24,35 @@ $pcodpes = intval(trim($_COOKIE['SAMLUSPSIBI_DATA']['NUSP']));
 
 $conn = oci_connect(DBUSR, DBPWD, DBURL);
 
+
+// EXCLUI IDENTIFICADOR
+if(filter_input(INPUT_GET,'op') == 'del'){
+
+  $stmt="BEGIN perfil_sibi.exclui_identificador(:ptype,:pvalue); END;";
+  
+//  echo $stmt; exit;
+
+  $pvalue = filter_input(INPUT_GET,'val');
+  $ptype = filter_input(INPUT_GET,'type');
+  
+  $stid = oci_parse($conn, $stmt);
+  if(!$stid){ exit; }
+  
+  oci_bind_by_name($stid,':pvalue',$pvalue);
+  oci_bind_by_name($stid,':ptype',$ptype);
+
+  oci_execute($stid);
+
+  oci_commit($conn);
+
+  oci_free_statement($stid);
+  oci_close($conn);
+  
+  header('Location: perfil-home.php');
+  
+}
+// EXCLUI IDENTIFICADOR
+
 // CV LATTES [INICIO]
 $stmt="BEGIN perfil_sibi.atualiza_identificador_lattes(:pcodpes); END;";
 
@@ -84,7 +113,7 @@ if(array_key_exists('LATTES',$rperfil)){
 if(array_key_exists('ORCID',$rperfil)){
 	foreach($rperfil['ORCID'] as $ko => $vo){
 ?>
-		  <li>ORCID: <a href="https://sandbox.orcid.org/<?=$rperfil['ORCID'][$ko]?>" target="_blank"><?=$rperfil['ORCID'][$ko]?></a></li>
+		  <li>ORCID: <a href="https://sandbox.orcid.org/<?=$rperfil['ORCID'][$ko]?>" target="_blank"><?=$rperfil['ORCID'][$ko]?></a> (<a href="perfil-home.php?op=del&type=ORCID&val=<?=$rperfil['ORCID'][$ko]?>"> excluir </a>)</li>
 <?php
 	}
  // <li><a href='orcid.php' title="ORCID" >adicionar outro ORCID</a></li>

@@ -2,6 +2,8 @@
 
 include('config.php');
 
+$currentBaseURL = (array_key_exists('HTTPS',$_SERVER)?'https':'http').'://'.filter_input(INPUT_SERVER,'HTTP_HOST').filter_input(INPUT_SERVER,'SCRIPT_NAME');
+
 if($currentBaseURL !== OA2ORC_REDIRECT_URI){
   // caiu aqui é outra máquina, ex. bdpife5
   // setcookie('', 'perfil-home.php', 0, "/", ".sibi.usp.br");
