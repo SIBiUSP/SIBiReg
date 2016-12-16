@@ -1,3 +1,12 @@
+<?php
+
+// phpinfo();
+// exit;
+
+// $HOMEBASE = 'pesquisa-inicio.php';
+// include('saml.php');
+
+?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -8,15 +17,17 @@
         <script src="inc/uikit-2.27.1/js/uikit.min.js"></script>
     </head>
     <body>
-<?php include 'inc/header.inc' ?>
-    <h1>
-            Registro SIBi
+      <?php include 'inc/header.inc' ?>
+            <h1>
+            Pesquisa USP
             </h1>
+            <br>
+
             <ul>
-            <li> <a href='perfil-home.php'>Perfil SIBi USP</a>
-            <li> <a href='pesquisa-home.php'>Pesquisa USP</a>
-            <li> Listagens - Dedalus
+             <li>Acesse aqui para pesquisar vínculos USP: <a href="pesquisa-home.php?login=yes"> pesquisa USP </a>
             </ul>
+
         </div>
     </body>
 </html>
+

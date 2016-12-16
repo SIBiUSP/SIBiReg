@@ -1,29 +1,32 @@
 <?php
 
-include('config.php');
-
-$currentBaseURL = (array_key_exists('HTTPS',$_SERVER)?'https':'http').'://'.filter_input(INPUT_SERVER,'HTTP_HOST').filter_input(INPUT_SERVER,'SCRIPT_NAME');
-
-if($currentBaseURL !== OA2ORC_REDIRECT_URI){
-  // caiu aqui é outra máquina, ex. bdpife5
-  // setcookie('', 'perfil-home.php', 0, "/", ".sibi.usp.br");
-  setcookie('OA2ORCBACKURL', OA2ORCBACKURL, 0, "/", ".sibi.usp.br");
-  header(empty($_SERVER['QUERY_STRING']) ? 'Location: '.OA2ORC_REDIRECT_URI : 'Location: '.OA2ORC_REDIRECT_URI.'?'.$_SERVER['QUERY_STRING']);
-  exit;
-}
-
-include('saml.php');
-if(empty($_SESSION)) session_start();
-
-// credito: https://gist.github.com/hubgit/46a868b912ccd65e4a6b
-
 header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-// include('oauth.php');
+include('autentica.php');
+include_once('config.php');
+
+$currentBaseURL = (array_key_exists('HTTPS',$_SERVER)?'https':'http').'://'.filter_input(INPUT_SERVER,'HTTP_HOST').filter_input(INPUT_SERVER,'SCRIPT_NAME');
+
+if($currentBaseURL !== OA2ORC_REDIRECT_URI){
+	// caiu aqui é outra máquina, ex. bdpife5
+	// setcookie('', 'perfil-home.php', 0, "/", ".sibi.usp.br");
+	// setcookie('OA2ORCBACKURL', OA2ORCBACKURL, 0, "/", ".sibi.usp.br");
+
+	$kem = session_id();
+	$scheme = (array_key_exists('HTTPS',$_SERVER)?'https':'http');
+	$_SESSION['OA2ORCBACKURL'] = OA2ORCBACKURL;
+	
+	// $scheme.'://'.filter_input(INPUT_SERVER,'HTTP_HOST').filter_input(INPUT_SERVER,'REQUEST_URI');
+
+	header(empty($_SERVER['QUERY_STRING']) ? 'Location: '.OA2ORC_REDIRECT_URI.'?kem='.$kem : 'Location: '.OA2ORC_REDIRECT_URI.'?'.$_SERVER['QUERY_STRING'].'&kem='.$kem);
+	exit;
+}
+
+// credito: https://gist.github.com/hubgit/46a868b912ccd65e4a6b
 
 if (ORCID_PRODUCTION) {
   define('OA2ORC_AUTHORIZATION_URL', 'https://orcid.org/oauth/authorize');
@@ -35,7 +38,7 @@ if (ORCID_PRODUCTION) {
   define('OA2ORC_TOKEN_URL', 'https://api.sandbox.orcid.org/oauth/token'); // members
 }
 
-if(empty($_GET['code'])) {
+if(strlen(filter_input(INPUT_GET,'code')) === 0) {
   $state = bin2hex(openssl_random_pseudo_bytes(16));
   setcookie('oauth_state', $state, time() + 3600, null, null, false, true);
   $_SESSION['oauth_state'] = bin2hex(openssl_random_pseudo_bytes(16));
@@ -50,7 +53,7 @@ if(empty($_GET['code'])) {
   exit();
 }
 
-if ( empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth_state']) ) {
+if ( filter_input(INPUT_GET,'state') !== $_SESSION['oauth_state'] ) {
  exit('Invalid state');
 }
 
@@ -61,7 +64,7 @@ curl_setopt_array($curl, array(
   CURLOPT_HTTPHEADER => array('Accept: application/json'),
   CURLOPT_POST => true,
   CURLOPT_POSTFIELDS => http_build_query(array(
-    'code' => $_GET['code'],
+    'code' => filter_input(INPUT_GET,'code'),
     'grant_type' => 'authorization_code',
     'client_id' => OA2ORC_CLIENT_ID,
     'client_secret' => OA2ORC_CLIENT_SECRET
@@ -80,7 +83,16 @@ $sqlqry = "BEGIN :rpsres := perfil_sibi.agrega_identificador_orcid(:pcodpes,:pva
 $stid = oci_parse($conn, $sqlqry);
 if(!$stid){ exit; }
 
-$pcodpes = intval($_COOKIE['SAMLUSPSIBI_DATA']['NUSP']);
+/*
+echo "<pre> olha isso:\n";
+print_r($response);
+echo "\n";
+print_r($_SESSION);
+echo "\n</pre>";
+exit;
+*/
+
+$pcodpes = intval($_SESSION['dadosusp']['nusp']);
 $pvalor = $response['orcid'];
 $rpsres = '';
 oci_bind_by_name($stid,':pcodpes',$pcodpes);
@@ -94,11 +106,11 @@ oci_commit($conn);
 oci_free_statement($stid);
 oci_close($conn);
 
-if(empty($_COOKIE['OA2ORCBACKURL'])){
-  header('Location: '.OA2ORCBACKURL);
+if(isset($_SESSION['OA2ORCBACKURL'])){
+  header('Location: '.$_SESSION['OA2ORCBACKURL']);
 }
 else {
-  header('Location: '.$_COOKIE['OA2ORCBACKURL']);
+  header('Location: '.OA2ORCBACKURL);
 }
 
 /*

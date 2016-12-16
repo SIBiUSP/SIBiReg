@@ -1,13 +1,12 @@
 <?php
+
 header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-session_start();
-$_SESSION['HOMEBASE'] = 'perfil-inicio.php';
-include('saml.php');
+include('autentica.php');
 include_once('config.php');
 
 ini_set("display_errors", 1);
@@ -18,12 +17,11 @@ error_reporting(E_ALL);
 putenv("NLS_SORT=BINARY_AI");
 putenv("NLS_COMP=LINGUISTIC");
 
-if(!empty($_COOKIE['SAMLUSPSIBI_DATA']['NUSP']) && $_COOKIE['SAMLUSPSIBI_DATA']['ONSESS'] == 'yes' ){
+if(isset($_SESSION['dadosusp']['nusp'])){
 
-$pcodpes = intval(trim($_COOKIE['SAMLUSPSIBI_DATA']['NUSP']));
+$pcodpes = intval(trim($_SESSION['dadosusp']['nusp']));
 
 $conn = oci_connect(DBUSR, DBPWD, DBURL);
-
 
 // EXCLUI IDENTIFICADOR
 if(filter_input(INPUT_GET,'op') == 'del'){
@@ -100,8 +98,8 @@ oci_close($conn);
 	Perfil SIBiUSP
 	</h1>
 		<ul>
-		  <li>Nome: <?=$_COOKIE['SAMLUSPSIBI_DATA']['NOME']?></li>
-		  <li>Número USP: <?=$_COOKIE['SAMLUSPSIBI_DATA']['NUSP']?></li>
+		  <li>Nome: <?=$_SESSION['dadosusp']['nome']?></li>
+		  <li>Número USP: <?=$_SESSION['dadosusp']['nusp']?></li>
 <?php
 if(array_key_exists('LATTES',$rperfil)){
   foreach($rperfil['LATTES'] as $kl => $vl){
@@ -127,7 +125,7 @@ if(array_key_exists('ORCID',$rperfil)){
 ?>
 		</ul>
 		<br>
-		<a href="<?=$_SESSION['HOMEBASE']?>">sair</a>
+		<a href="autentica.php?logout=perfil-inicio.php">sair</a>
 		<br>    
     </div>
 <?php
@@ -143,6 +141,6 @@ print_r($rperfil);
 </html>
 <?php
 } else {
-  header('Location: '.$_SESSION['HOMEBASE'].'?logout=yes');
+  header('Location: autentica.php?logout=perfil-inicio.php');
   exit;
 } ?>
