@@ -121,7 +121,7 @@ if(array_key_exists('ORCID',$rperfil)){
 <?php
 } else {
 ?>
-		  <li style="line-height: 3"> <button id="connect-orcid-button" onclick="location.href='orcid.php'"><img id="orcid-id-logo" src="//orcid.org/sites/default/files/images/orcid_24x24.png" width='24' height='24' alt="ORCID logo"/>Create or Connect your ORCID iD</button> &nbsp; <div style="display: inline-block; vertical-align: top; background-color: #E8E8E8; padding: .8em; color: #666; font-size: .9em; width: 50%; line-height: 1">ORCID provides a persistent digital identifier that distinguishes you from other researchers. Learn more at <a href="http://orcid.org" target="_blank" >orcid.org</a>.</div>
+		  <li style="line-height: 3"> <button id="connect-orcid-button" onclick="location.href='orcid.php'"><img id="orcid-id-logo" src="//orcid.org/sites/default/files/images/orcid_24x24.png" width='24' height='24' alt="ORCID logo"/>Criar ou Associar seu ORCID iD</button> &nbsp; <div style="display: inline-block; vertical-align: top; background-color: #E8E8E8; padding: .8em; color: #666; font-size: .9em; width: 50%; line-height: 1">ORCID fornece um identificador digital consistente que o identifica unicamente dentre outros pesquisadores. Veja mais em <a href="http://orcid.org" target="_blank" >orcid.org</a>.</div>
 		   </li>
 		  
 		 <!-- ORCID: Não obtido (<a href='orcid.php' title="ORCID" >criar ou associar seu ORCID</a>)</li> <! -- data-uk-lightbox -->
