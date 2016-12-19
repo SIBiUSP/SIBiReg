@@ -26,7 +26,7 @@ $conn = oci_connect(DBUSR, DBPWD, DBURL);
 // EXCLUI IDENTIFICADOR
 if(filter_input(INPUT_GET,'op') == 'del'){
 
-  $stmt="BEGIN perfil_sibi.exclui_identificador(:ptype,:pvalue); END;";
+  $stmt="BEGIN perfil_sibi.exclui_identificador(:pcodpes,:ptype,:pvalue); END;";
   
 //  echo $stmt; exit;
 
@@ -36,6 +36,7 @@ if(filter_input(INPUT_GET,'op') == 'del'){
   $stid = oci_parse($conn, $stmt);
   if(!$stid){ exit; }
   
+  oci_bind_by_name($stid,':pcodpes',$pcodpes);
   oci_bind_by_name($stid,':pvalue',$pvalue);
   oci_bind_by_name($stid,':ptype',$ptype);
 
