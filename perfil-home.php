@@ -88,6 +88,7 @@ oci_close($conn);
         <title>Perfil SIBiUSP</title>
         <link rel="stylesheet" href="inc/uikit-2.27.1/css/uikit.min.css" />
         <link rel="stylesheet" href="inc/style.css" />
+        <link rel="stylesheet" href="inc/orcid.css" />
         <script src="inc/jquery-3.1.1.min.js"></script>
         <script src="inc/uikit-2.27.1/js/uikit.min.js"></script>
         <script src="inc/uikit-2.27.1/js/components/lightbox.js"></script>
@@ -98,20 +99,20 @@ oci_close($conn);
 	Perfil SIBiUSP
 	</h1>
 		<ul>
-		  <li>Nome: <?=$_SESSION['dadosusp']['nome']?></li>
-		  <li>Número USP: <?=$_SESSION['dadosusp']['nusp']?></li>
+		  <li style="line-height: 2">Nome: <b><?=$_SESSION['dadosusp']['nome']?></b></li>
+		  <li style="line-height: 2">Número USP: <a href="//uspdigital.usp.br" target="_blank"><?=$_SESSION['dadosusp']['nusp']?></a></li>
 <?php
 if(array_key_exists('LATTES',$rperfil)){
   foreach($rperfil['LATTES'] as $kl => $vl){
 ?>
-		  <li>CV Lattes: <a href="http://lattes.cnpq.br/<?=$rperfil['LATTES'][$kl]?>" target="_blank"><?=$rperfil['LATTES'][$kl]?></a> (obtido do sistema corporativo) </li>
+		  <li style="line-height: 3"> <a href="http://lattes.cnpq.br"><img id="CNPQ Lattes logo" alt="CNPQ Lattes logo" src="img/logo-curriculo_cut.png" width="16" height="16" /></a> <a href="http://lattes.cnpq.br/<?=$rperfil['LATTES'][$kl]?>" target="_blank">http://lattes.cnpq.br/<?=$rperfil['LATTES'][$kl]?></a> (obtido do sistema corporativo) </li>
 <?php
   }
 }
 if(array_key_exists('ORCID',$rperfil)){
 	foreach($rperfil['ORCID'] as $ko => $vo){
 ?>
-		  <li>ORCID: <a href="https://sandbox.orcid.org/<?=$rperfil['ORCID'][$ko]?>" target="_blank"><?=$rperfil['ORCID'][$ko]?></a> (<a href="perfil-home.php?op=del&type=ORCID&val=<?=$rperfil['ORCID'][$ko]?>"> excluir </a>)</li>
+		  <li style="line-height: 3"> <a href="http://orcid.org"><img alt="ORCID logo" src="//orcid.org/sites/default/files/images/orcid_16x16.png" width="16" height="16" /></a> <a href="https://sandbox.orcid.org/<?=$rperfil['ORCID'][$ko]?>" target="_blank">http://orcid.org/<?=$rperfil['ORCID'][$ko]?></a> (<a href="perfil-home.php?op=del&type=ORCID&val=<?=$rperfil['ORCID'][$ko]?>"> excluir </a>)</li>
 <?php
 	}
  // <li><a href='orcid.php' title="ORCID" >adicionar outro ORCID</a></li>
@@ -119,7 +120,10 @@ if(array_key_exists('ORCID',$rperfil)){
 <?php
 } else {
 ?>
-		  <li>ORCID: Não obtido (<a href='orcid.php' title="ORCID" >criar ou associar seu ORCID</a>)</li><!-- data-uk-lightbox -->
+		  <li style="line-height: 3"> <button id="connect-orcid-button" onclick="location.href='orcid.php'"><img id="orcid-id-logo" src="//orcid.org/sites/default/files/images/orcid_24x24.png" width='24' height='24' alt="ORCID logo"/>Create or Connect your ORCID iD</button> &nbsp; <div style="display: inline-block; vertical-align: top; background-color: #E8E8E8; padding: .8em; color: #666; font-size: .9em; width: 50%; line-height: 1">ORCID provides a persistent digital identifier that distinguishes you from other researchers. Learn more at <a href="http://orcid.org" target="_blank" >orcid.org</a>.</div>
+		   </li>
+		  
+		 <!-- ORCID: Não obtido (<a href='orcid.php' title="ORCID" >criar ou associar seu ORCID</a>)</li> <! -- data-uk-lightbox -->
 <?php
 }
 ?>
