@@ -14,8 +14,14 @@
             </h1>
             <ul>
             <li> <a href='perfil-home.php'>Perfil SIBi USP</a>
-            <li> <a href='pesquisa-home.php'>Pesquisa USP</a>
+            <?php
+	    /*
+	    <!--
+	    <li> <a href='pesquisa-home.php'>Pesquisa USP</a>
             <li> Listagens - Dedalus
+	    -->
+	    */
+	    ?>
             </ul>
         </div>
     </body>
