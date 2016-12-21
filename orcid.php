@@ -26,6 +26,11 @@ if($currentBaseURL !== OA2ORC_REDIRECT_URI){
 	exit;
 }
 
+putenv("NLS_SORT=BINARY_AI");
+putenv("NLS_COMP=LINGUISTIC");
+
+$conn = oci_connect(DBUSR, DBPWD, DBURL);
+
 // credito: https://gist.github.com/hubgit/46a868b912ccd65e4a6b
 
 if (ORCID_PRODUCTION) {
@@ -74,10 +79,24 @@ curl_setopt_array($curl, array(
 $result = curl_exec($curl);
 $response = json_decode($result, true);
 
-putenv("NLS_SORT=BINARY_AI");
-putenv("NLS_COMP=LINGUISTIC");
+$sqlqry = "BEGIN perfil_sibi.isola_identificador(:pcodpes,'ORCIDTOKACC',:pvalor); END;";
 
-$conn = oci_connect(DBUSR, DBPWD, DBURL);
+$stid = oci_parse($conn, $sqlqry);
+if(!$stid){ exit; }
+
+/*
+echo "<pre>\n";
+print_r($response);
+echo "\n</pre>";
+exit;
+*/
+
+$pcodpes = intval($_SESSION['dadosusp']['nusp']);
+$pvalor = $response['access_token'];
+oci_bind_by_name($stid,':pcodpes',$pcodpes);
+oci_bind_by_name($stid,':pvalor',$pvalor);
+
+oci_execute($stid,OCI_NO_AUTO_COMMIT);
 
 $sqlqry = "BEGIN :rpsres := perfil_sibi.agrega_identificador_orcid(:pcodpes,:pvalor); END;";
 
@@ -108,7 +127,9 @@ oci_free_statement($stid);
 oci_close($conn);
 
 if(isset($_SESSION['OA2ORCBACKURL'])){
-  header('Location: '.$_SESSION['OA2ORCBACKURL']);
+  $tmpOA2ORCBACKURL = $_SESSION['OA2ORCBACKURL'];
+  unset($_SESSION['OA2ORCBACKURL']);
+  header('Location: '.$tmpOA2ORCBACKURL);
 }
 else {
   header('Location: '.OA2ORCBACKURL);
