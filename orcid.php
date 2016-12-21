@@ -51,12 +51,13 @@ if(strlen(filter_input(INPUT_GET,'code')) === 0) {
       'response_type' => 'code',
       'client_id' => OA2ORC_CLIENT_ID,
       'redirect_uri' => OA2ORC_REDIRECT_URI,
-      'scope' => '/authenticate',
+      'scope' => '/read-limited /activities/update /person/update',
       'state' => $_SESSION['oauth_state'],
       'lang' => 'pt'
   ));
   header('Location: ' . $url);
   exit();
+// 'scope' => '/authenticate',
 }
 
 if ( filter_input(INPUT_GET,'state') !== $_SESSION['oauth_state'] ) {
