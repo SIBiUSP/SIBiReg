@@ -47,7 +47,8 @@ if(strlen(filter_input(INPUT_GET,'code')) === 0) {
       'client_id' => OA2ORC_CLIENT_ID,
       'redirect_uri' => OA2ORC_REDIRECT_URI,
       'scope' => '/authenticate',
-      'state' => $_SESSION['oauth_state']
+      'state' => $_SESSION['oauth_state'],
+      'lang' => 'pt'
   ));
   header('Location: ' . $url);
   exit();
