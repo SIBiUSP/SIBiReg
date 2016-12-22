@@ -26,28 +26,40 @@ $conn = oci_connect(DBUSR, DBPWD, DBURL);
 // EXCLUI IDENTIFICADOR
 if(filter_input(INPUT_GET,'op') == 'del'){
 
-  $stmt="BEGIN perfil_sibi.exclui_identificador(:pcodpes,:ptype,:pvalue); END;";
-  
-//  echo $stmt; exit;
+	if(filter_input(INPUT_GET,'type') == 'ORCID'){
 
-  $pvalue = filter_input(INPUT_GET,'val');
-  $ptype = filter_input(INPUT_GET,'type');
-  
-  $stid = oci_parse($conn, $stmt);
-  if(!$stid){ exit; }
-  
-  oci_bind_by_name($stid,':pcodpes',$pcodpes);
-  oci_bind_by_name($stid,':pvalue',$pvalue);
-  oci_bind_by_name($stid,':ptype',$ptype);
+		$stmt="BEGIN perfil_sibi.exclui_identificador(:pcodpes,'ORCID',:pvalue); END;";
 
-  oci_execute($stid);
+		$pvalue = filter_input(INPUT_GET,'val');
 
-  oci_commit($conn);
+		$stid = oci_parse($conn, $stmt);
+		if(!$stid){ exit; }
 
-  oci_free_statement($stid);
-  oci_close($conn);
-  
-  header('Location: perfil-home.php');
+		oci_bind_by_name($stid,':pcodpes',$pcodpes);
+		oci_bind_by_name($stid,':pvalue',$pvalue);
+
+		oci_execute($stid);
+
+		$stmt="BEGIN perfil_sibi.exclui_identificador(:pcodpes,'ORCIDTOKACC',:pvalue); END;";
+
+		$pvalue = filter_input(INPUT_GET,'val');
+
+		$stid = oci_parse($conn, $stmt);
+		if(!$stid){ exit; }
+
+		oci_bind_by_name($stid,':pcodpes',$pcodpes);
+		oci_bind_by_name($stid,':pvalue',$pvalue);
+
+		oci_execute($stid);
+
+	}
+
+	oci_commit($conn);
+
+	oci_free_statement($stid);
+	oci_close($conn);
+
+	header('Location: perfil-home.php');
   
 }
 // EXCLUI IDENTIFICADOR
@@ -106,14 +118,14 @@ oci_close($conn);
 if(array_key_exists('LATTES',$rperfil)){
   foreach($rperfil['LATTES'] as $kl => $vl){
 ?>
-		  <li style="line-height: 3"> <a href="http://lattes.cnpq.br"><img id="CNPQ Lattes logo" alt="CNPQ Lattes logo" src="img/logo-curriculo_cut.png" width="16" height="16" /></a> <a href="http://lattes.cnpq.br/<?=$rperfil['LATTES'][$kl]?>" target="_blank">http://lattes.cnpq.br/<?=$rperfil['LATTES'][$kl]?></a> (obtido do sistema corporativo) </li>
+		  <li style="line-height: 3"><div style="line-height:1"><a href="http://lattes.cnpq.br"><img id="CNPQ Lattes logo" alt="CNPQ Lattes logo" src="img/logo-curriculo_cut.png" width="16" height="16" /></a> <a href="http://lattes.cnpq.br/<?=$rperfil['LATTES'][$kl]?>" target="_blank">http://lattes.cnpq.br/<?=$rperfil['LATTES'][$kl]?></a> (obtido do sistema corporativo)</div></li>
 <?php
   }
 }
 if(array_key_exists('ORCID',$rperfil)){
 	foreach($rperfil['ORCID'] as $ko => $vo){
 ?>
-		  <li style="line-height: 3"> <a href="http://orcid.org"><img alt="ORCID logo" src="//orcid.org/sites/default/files/images/orcid_16x16.png" width="16" height="16" /></a> <a href="https://sandbox.orcid.org/<?=$rperfil['ORCID'][$ko]?>" target="_blank">http://orcid.org/<?=$rperfil['ORCID'][$ko]?></a> (<a href="perfil-home.php?op=del&type=ORCID&val=<?=$rperfil['ORCID'][$ko]?>"> excluir </a>)</li>
+		  <li style="line-height: 3"><div style="line-height:1"><a href="http://orcid.org"><img alt="ORCID logo" src="//orcid.org/sites/default/files/images/orcid_16x16.png" width="16" height="16" /></a> <a href="https://sandbox.orcid.org/<?=$rperfil['ORCID'][$ko]?>" target="_blank">http://orcid.org/<?=$rperfil['ORCID'][$ko]?></a> (<a href="perfil-home.php?op=del&type=ORCID&val=<?=$rperfil['ORCID'][$ko]?>"> desconectar </a>)</div></li>
 <?php
 	}
  // <li><a href='orcid.php' title="ORCID" >adicionar outro ORCID</a></li>
@@ -121,7 +133,7 @@ if(array_key_exists('ORCID',$rperfil)){
 <?php
 } else {
 ?>
-		  <li style="line-height: 3"> <button id="connect-orcid-button" onclick="location.href='orcid.php'"><img id="orcid-id-logo" src="//orcid.org/sites/default/files/images/orcid_24x24.png" width='24' height='24' alt="ORCID logo"/>Criar ou Associar seu ORCID iD</button> &nbsp; <div style="display: inline-block; vertical-align: top; background-color: #E8E8E8; padding: .8em; color: #666; font-size: .9em; width: 50%; line-height: 1">ORCID fornece um identificador digital consistente que o identifica unicamente dentre outros pesquisadores. Veja mais em <a href="http://orcid.org" target="_blank" >orcid.org</a>.</div>
+		  <li style="line-height: 3"><button id="connect-orcid-button" onclick="location.href='orcid.php'"><img id="orcid-id-logo" src="//orcid.org/sites/default/files/images/orcid_24x24.png" width='24' height='24' alt="ORCID logo"/>Criar ou Associar seu ORCID iD</button> &nbsp; <div style="display: inline-block; vertical-align: top; background-color: #E8E8E8; padding: .8em; color: #666; font-size: .9em; width: 50%; line-height: 1">ORCID fornece um identificador digital consistente que o identifica unicamente dentre outros pesquisadores. Veja mais em <a href="http://orcid.org" target="_blank" >orcid.org</a>.</div>
 		   </li>
 		  
 		 <!-- ORCID: Não obtido (<a href='orcid.php' title="ORCID" >criar ou associar seu ORCID</a>)</li> <! -- data-uk-lightbox -->

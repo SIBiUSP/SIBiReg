@@ -53,6 +53,7 @@ if(strlen(filter_input(INPUT_GET,'code')) === 0) {
       'redirect_uri' => OA2ORC_REDIRECT_URI,
       'scope' => '/read-limited /activities/update /person/update',
       'state' => $_SESSION['oauth_state'],
+      'show_login' => 'true',
       'lang' => 'pt'
   ));
   header('Location: ' . $url);
@@ -80,6 +81,8 @@ curl_setopt_array($curl, array(
 $result = curl_exec($curl);
 $response = json_decode($result, true);
 
+/*============================*/
+
 $sqlqry = "BEGIN perfil_sibi.isola_identificador(:pcodpes,'ORCIDTOKACC',:pvalor); END;";
 
 $stid = oci_parse($conn, $sqlqry);
@@ -98,6 +101,9 @@ oci_bind_by_name($stid,':pcodpes',$pcodpes);
 oci_bind_by_name($stid,':pvalor',$pvalor);
 
 oci_execute($stid,OCI_NO_AUTO_COMMIT);
+
+/*============================*/
+/*============================*/
 
 $sqlqry = "BEGIN :rpsres := perfil_sibi.agrega_identificador_orcid(:pcodpes,:pvalor); END;";
 
@@ -121,6 +127,8 @@ oci_bind_by_name($stid,':pvalor',$pvalor);
 oci_bind_by_name($stid,':rpsres',$rpsres,2000,SQLT_CHR);
 
 oci_execute($stid,OCI_NO_AUTO_COMMIT);
+
+/*============================*/
 
 oci_commit($conn);
 
