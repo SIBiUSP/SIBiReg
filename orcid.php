@@ -12,15 +12,10 @@ include_once('config.php');
 $currentBaseURL = (array_key_exists('HTTPS',$_SERVER)?'https':'http').'://'.filter_input(INPUT_SERVER,'HTTP_HOST').filter_input(INPUT_SERVER,'SCRIPT_NAME');
 
 if($currentBaseURL !== OA2ORC_REDIRECT_URI){
-	// caiu aqui é outra máquina, ex. bdpife5
-	// setcookie('', 'perfil-home.php', 0, "/", ".sibi.usp.br");
-	// setcookie('OA2ORCBACKURL', OA2ORCBACKURL, 0, "/", ".sibi.usp.br");
 
 	$kem = session_id();
 	$scheme = (array_key_exists('HTTPS',$_SERVER)?'https':'http');
 	$_SESSION['OA2ORCBACKURL'] = OA2ORCBACKURL;
-	
-	// $scheme.'://'.filter_input(INPUT_SERVER,'HTTP_HOST').filter_input(INPUT_SERVER,'REQUEST_URI');
 
 	header(empty($_SERVER['QUERY_STRING']) ? 'Location: '.OA2ORC_REDIRECT_URI.'?kem='.$kem : 'Location: '.OA2ORC_REDIRECT_URI.'?'.$_SERVER['QUERY_STRING'].'&kem='.$kem);
 	exit;
@@ -58,7 +53,6 @@ if(strlen(filter_input(INPUT_GET,'code')) === 0) {
   ));
   header('Location: ' . $url);
   exit();
-// 'scope' => '/authenticate',
 }
 
 if ( filter_input(INPUT_GET,'state') !== $_SESSION['oauth_state'] ) {
@@ -110,15 +104,6 @@ $sqlqry = "BEGIN :rpsres := perfil_sibi.agrega_identificador_orcid(:pcodpes,:pva
 $stid = oci_parse($conn, $sqlqry);
 if(!$stid){ exit; }
 
-/*
-echo "<pre> olha isso:\n";
-print_r($response);
-echo "\n";
-print_r($_SESSION);
-echo "\n</pre>";
-exit;
-*/
-
 $pcodpes = intval($_SESSION['dadosusp']['nusp']);
 $pvalor = $response['orcid'];
 $rpsres = '';
@@ -138,37 +123,31 @@ oci_close($conn);
 if(isset($_SESSION['OA2ORCBACKURL'])){
   $tmpOA2ORCBACKURL = $_SESSION['OA2ORCBACKURL'];
   unset($_SESSION['OA2ORCBACKURL']);
-  header('Location: '.$tmpOA2ORCBACKURL);
-}
-else {
-  header('Location: '.OA2ORCBACKURL);
-}
-
 /*
-? >
+  header('Location: '.$tmpOA2ORCBACKURL);
+*/
+?>
 <html>
 <head>
-<script language=javascript>
-function godo(){
-< ?php
+<script language="javascript">
+function autoload(){
+<?php
  if($rpsres == 'NO'){
-? >
+?>
         setTimeout(function() { alert('Não foi possível incluir, ORCID já existente!'); } );
-< ?php
+<?php
  }
-? >
-	if(self == top){
-	 location.replace("< ?=$_COOKIE['OA2ORCBACKURL']? >");
-	}
-	else {
-	  parent.$("body > div.uk-modal.uk-open > div > a").click();
-	  parent.$("body > div.uk-modal.uk-open > div > div.uk-lightbox-content > iframe").src="";
-	  parent.location.reload();
-	}
+?>
+	parent.opener.location.href='perfil-home.php';
+	parent.close();
 }
 </script>
 </head>
-<body onload="godo();" >
+<body onload="autoload();" >
 </body>
 </html>
-*/
+<?php
+}
+else {
+ header('Location: '.OA2ORCBACKURL);
+}

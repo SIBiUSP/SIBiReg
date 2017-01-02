@@ -105,6 +105,13 @@ oci_close($conn);
         <script src="inc/jquery-3.1.1.min.js"></script>
         <script src="inc/uikit-2.27.1/js/uikit.min.js"></script>
         <script src="inc/uikit-2.27.1/js/components/lightbox.js"></script>
+	<script type=text/javascript>
+	var oauthWindow;
+
+	function openORCID() {
+	    var oauthWindow = window.open("orcid.php", "_blank", "toolbar=no, scrollbars=yes, width=580, height=" + (outerHeight*0.8) + ", top=" + (screenTop + (outerHeight - innerHeight)*0.2) + ", left=" + (screenLeft + (innerWidth - 580)*0.5));
+	}
+	</script>
     </head>
     <body>
 	<?php include 'inc/header.inc' ?>
@@ -133,7 +140,7 @@ if(array_key_exists('ORCID',$rperfil)){
 <?php
 } else {
 ?>
-		  <li style="line-height: 3"><button id="connect-orcid-button" onclick="location.href='orcid.php'"><img id="orcid-id-logo" src="//orcid.org/sites/default/files/images/orcid_24x24.png" width='24' height='24' alt="ORCID logo"/>Criar ou Associar seu ORCID iD</button> &nbsp; <div style="display: inline-block; vertical-align: top; background-color: #E8E8E8; padding: .8em; color: #666; font-size: .9em; width: 50%; line-height: 1">ORCID fornece um identificador digital consistente que o identifica unicamente dentre outros pesquisadores. Veja mais em <a href="http://orcid.org" target="_blank" >orcid.org</a>.</div>
+		  <li style="line-height: 3"><button id="connect-orcid-button" onclick="openORCID()"><img id="orcid-id-logo" src="//orcid.org/sites/default/files/images/orcid_24x24.png" width='24' height='24' alt="ORCID logo"/>Criar ou Associar seu ORCID iD</button> &nbsp; <div style="display: inline-block; vertical-align: top; background-color: #E8E8E8; padding: .8em; color: #666; font-size: .9em; width: 50%; line-height: 1">ORCID fornece um identificador digital consistente que o identifica unicamente dentre outros pesquisadores. Veja mais em <a href="http://orcid.org" target="_blank" >http://orcid.org</a>.</div>
 		   </li>
 		  
 		 <!-- ORCID: Não obtido (<a href='orcid.php' title="ORCID" >criar ou associar seu ORCID</a>)</li> <! -- data-uk-lightbox -->
