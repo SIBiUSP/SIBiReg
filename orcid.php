@@ -120,11 +120,14 @@ oci_commit($conn);
 oci_free_statement($stid);
 oci_close($conn);
 
+/*
 if(isset($_SESSION['OA2ORCBACKURL'])){
   $tmpOA2ORCBACKURL = $_SESSION['OA2ORCBACKURL'];
   unset($_SESSION['OA2ORCBACKURL']);
-/*
   header('Location: '.$tmpOA2ORCBACKURL);
+else {
+ header('Location: '.OA2ORCBACKURL);
+}
 */
 ?>
 <html>
@@ -146,8 +149,3 @@ function autoload(){
 <body onload="autoload();" >
 </body>
 </html>
-<?php
-}
-else {
- header('Location: '.OA2ORCBACKURL);
-}
