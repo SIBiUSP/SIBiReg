@@ -132,7 +132,7 @@ if(array_key_exists('LATTES',$rperfil)){
 if(array_key_exists('ORCID',$rperfil)){
 	foreach($rperfil['ORCID'] as $ko => $vo){
 ?>
-		  <li style="line-height: 3"><div style="line-height:1"><a href="http://orcid.org"><img alt="ORCID logo" src="//orcid.org/sites/default/files/images/orcid_16x16.png" width="16" height="16" /></a> <a href="https://sandbox.orcid.org/<?=$rperfil['ORCID'][$ko]?>" target="_blank">http://orcid.org/<?=$rperfil['ORCID'][$ko]?></a> (<a href="perfil-home.php?op=del&type=ORCID&val=<?=$rperfil['ORCID'][$ko]?>"> desconectar </a>)</div></li>
+		  <li style="line-height: 3"><div style="line-height:1"><a href="http://orcid.org"><img alt="ORCID logo" src="//orcid.org/sites/default/files/images/orcid_16x16.png" width="16" height="16" /></a> <a href="https://<?=ORCID_HOSTBASE?>/<?=$rperfil['ORCID'][$ko]?>" target="_blank">http://<?=ORCID_HOSTBASE?>/<?=$rperfil['ORCID'][$ko]?></a> (<a href="perfil-home.php?op=del&type=ORCID&val=<?=$rperfil['ORCID'][$ko]?>"> desconectar </a>)</div></li>
 <?php
 	}
  // <li><a href='orcid.php' title="ORCID" >adicionar outro ORCID</a></li>
