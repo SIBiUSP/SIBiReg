@@ -28,16 +28,6 @@ $conn = oci_connect(DBUSR, DBPWD, DBURL);
 
 // credito: https://gist.github.com/hubgit/46a868b912ccd65e4a6b
 
-if (ORCID_PRODUCTION) {
-  define('OA2ORC_AUTHORIZATION_URL', 'https://orcid.org/oauth/authorize');
-  //define('OA2ORC_TOKEN_URL', 'https://pub.orcid.org/oauth/token'); // public
-  define('OA2ORC_TOKEN_URL', 'https://api.orcid.org/oauth/token'); // members
-} else {
-  define('OA2ORC_AUTHORIZATION_URL', 'https://sandbox.orcid.org/oauth/authorize');
-  //define('OA2ORC_TOKEN_URL', 'https://pub.sandbox.orcid.org/oauth/token'); // public
-  define('OA2ORC_TOKEN_URL', 'https://api.sandbox.orcid.org/oauth/token'); // members
-}
-
 if(strlen(filter_input(INPUT_GET,'code')) === 0) {
   $state = bin2hex(openssl_random_pseudo_bytes(16));
   setcookie('oauth_state', $state, time() + 3600, null, null, false, true);
