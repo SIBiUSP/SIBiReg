@@ -132,7 +132,7 @@ if(array_key_exists('LATTES',$rperfil)){
 if(array_key_exists('ORCID',$rperfil)){
 	foreach($rperfil['ORCID'] as $ko => $vo){
 ?>
-		  <li style="line-height: 3"><div style="line-height:1"><a href="http://orcid.org"><img alt="ORCID logo" src="//orcid.org/sites/default/files/images/orcid_16x16.png" width="16" height="16" /></a> <a href="https://<?=ORCID_HOSTBASE?>/<?=$rperfil['ORCID'][$ko]?>" target="_blank">http://<?=ORCID_HOSTBASE?>/<?=$rperfil['ORCID'][$ko]?></a> (<a href="perfil-home.php?op=del&type=ORCID&val=<?=$rperfil['ORCID'][$ko]?>"> desconectar </a>)</div></li>
+		  <li style="line-height: 3"><div style="line-height:1"><a href="http://<?=ORCID_HOSTBASE?>"><img alt="ORCID logo" src="//<?=ORCID_HOSTBASE?>/sites/default/files/images/orcid_16x16.png" width="16" height="16" /></a> <a href="https://<?=ORCID_HOSTBASE?>/<?=$rperfil['ORCID'][$ko]?>" target="_blank">http://<?=ORCID_HOSTBASE?>/<?=$rperfil['ORCID'][$ko]?></a> (<a href="perfil-home.php?op=del&type=ORCID&val=<?=$rperfil['ORCID'][$ko]?>"> desconectar </a>)</div></li>
 <?php
 	}
  // <li><a href='orcid.php' title="ORCID" >adicionar outro ORCID</a></li>
@@ -140,7 +140,7 @@ if(array_key_exists('ORCID',$rperfil)){
 <?php
 } else {
 ?>
-		  <li style="line-height: 3"><button id="connect-orcid-button" onclick="openORCID()"><img id="orcid-id-logo" src="//orcid.org/sites/default/files/images/orcid_24x24.png" width='24' height='24' alt="ORCID logo"/>Criar ou Associar seu ORCID iD</button> &nbsp; <div style="display: inline-block; vertical-align: top; background-color: #E8E8E8; padding: .8em; color: #666; font-size: .9em; width: 50%; line-height: 1">ORCID fornece um identificador digital consistente que o identifica unicamente dentre outros pesquisadores. Veja mais em <a href="http://orcid.org" target="_blank" >http://orcid.org</a>.</div>
+		  <li style="line-height: 3"><button id="connect-orcid-button" onclick="openORCID()"><img id="orcid-id-logo" src="//<?=ORCID_HOSTBASE?>/sites/default/files/images/orcid_24x24.png" width='24' height='24' alt="ORCID logo"/>Criar ou Associar seu ORCID iD</button> &nbsp; <div style="display: inline-block; vertical-align: top; background-color: #E8E8E8; padding: .8em; color: #666; font-size: .9em; width: 50%; line-height: 1">ORCID fornece um identificador digital consistente que o identifica unicamente dentre outros pesquisadores. Veja mais em <a href="http://<?=ORCID_HOSTBASE?>" target="_blank" >http://<?=ORCID_HOSTBASE?></a>.</div>
 		   </li>
 		  
 		 <!-- ORCID: Não obtido (<a href='orcid.php' title="ORCID" >criar ou associar seu ORCID</a>)</li> <! -- data-uk-lightbox -->
