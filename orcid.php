@@ -110,15 +110,14 @@ oci_commit($conn);
 oci_free_statement($stid);
 oci_close($conn);
 
-/*
 if(isset($_SESSION['OA2ORCBACKURL'])){
   $tmpOA2ORCBACKURL = $_SESSION['OA2ORCBACKURL'];
   unset($_SESSION['OA2ORCBACKURL']);
-  header('Location: '.$tmpOA2ORCBACKURL);
 else {
- header('Location: '.OA2ORCBACKURL);
+  $tmpOA2ORCBACKURL = OA2ORCBACKURL;
 }
-*/
+// header('Location: '.$tmpOA2ORCBACKURL);
+
 ?>
 <html>
 <head>
@@ -131,7 +130,7 @@ function autoload(){
 <?php
  }
 ?>
-	parent.opener.location.href='perfil-home.php';
+	parent.opener.location.href='<?=$tmpOA2ORCBACKURL?>';
 	parent.close();
 }
 </script>
