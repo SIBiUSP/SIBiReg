@@ -9,7 +9,7 @@ ini_set('display_startup_errors', 1);
 ini_set('display_errors', 1);
 error_reporting(-1);
 
-include_once('config.php');
+include('config.php');
 
 if(session_status() === PHP_SESSION_ACTIVE){
     /*

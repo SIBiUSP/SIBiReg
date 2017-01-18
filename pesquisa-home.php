@@ -8,7 +8,7 @@ header("Pragma: no-cache");
 session_start();
 $_SESSION['HOMEBASE'] = 'pesquisa-inicio.php';
 include('oauth.php');
-include_once('config.php');
+include('config.php');
 
 ini_set("display_errors", 1);
 ini_set("track_errors", 1);
