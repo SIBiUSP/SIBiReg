@@ -113,6 +113,7 @@ oci_close($conn);
 if(isset($_SESSION['OA2ORCBACKURL'])){
   $tmpOA2ORCBACKURL = $_SESSION['OA2ORCBACKURL'];
   unset($_SESSION['OA2ORCBACKURL']);
+}
 else {
   $tmpOA2ORCBACKURL = OA2ORCBACKURL;
 }
