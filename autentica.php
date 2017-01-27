@@ -218,6 +218,10 @@ else {
 
 	ini_set('session.save_handler','memcached');
 	ini_set('session.save_path',MEMCACHESRVR.':'.MEMCACHEPORT);
+	$kem = filter_input(INPUT_GET,'kem');
+	if(!empty($kem)){
+		session_id($kem);
+	}
 	session_start();
 
 	if(isset($_SESSION['dadosusp'])){

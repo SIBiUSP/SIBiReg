@@ -6,17 +6,39 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-include('autentica.php');
-include('config.php');
+
+if(strlen(filter_input(INPUT_GET,'code')) === 0) {
+	include('config.php');
+	ini_set('session.save_handler','memcached');
+	ini_set('session.save_path',MEMCACHESRVR.':'.MEMCACHEPORT);
+	$kem = filter_input(INPUT_GET,'kem');
+	if(!empty($kem)){
+		session_id($kem);
+	}
+	session_start();
+	include('config.php');
+}
+else {
+	include('autentica.php');
+	include('config.php');
+}
 
 $currentBaseURL = (array_key_exists('HTTPS',$_SERVER)?'https':'http').'://'.filter_input(INPUT_SERVER,'HTTP_HOST').filter_input(INPUT_SERVER,'SCRIPT_NAME');
+
+if(((string)filter_input(INPUT_GET,'obkurl')) === ''){
+  $orcbackurl = OA2ORCBACKURL;
+}
+else {
+  $orcbackurl = filter_input(INPUT_GET,'obkurl');
+}
 
 if($currentBaseURL !== OA2ORC_REDIRECT_URI){
 
 	$kem = session_id();
 	$scheme = (array_key_exists('HTTPS',$_SERVER)?'https':'http');
-	$_SESSION['OA2ORCBACKURL'] = OA2ORCBACKURL;
+	$_SESSION['OA2ORCBACKURL'] = $orcbackurl;
 
+	session_write_close();
 	header(empty($_SERVER['QUERY_STRING']) ? 'Location: '.OA2ORC_REDIRECT_URI.'?kem='.$kem : 'Location: '.OA2ORC_REDIRECT_URI.'?'.$_SERVER['QUERY_STRING'].'&kem='.$kem);
 	exit;
 }
@@ -35,17 +57,38 @@ if(strlen(filter_input(INPUT_GET,'code')) === 0) {
   $url = OA2ORC_AUTHORIZATION_URL . '?' . http_build_query(array(
       'response_type' => 'code',
       'client_id' => OA2ORC_CLIENT_ID,
-      'redirect_uri' => OA2ORC_REDIRECT_URI,
+      'redirect_uri' => OA2ORC_REDIRECT_URI.(empty($kem)?'':'?kem='.$kem),
       'scope' => '/read-limited /activities/update /person/update',
       'state' => $_SESSION['oauth_state'],
       'show_login' => 'true',
       'lang' => 'pt'
   ));
+  session_write_close();
   header('Location: ' . $url);
+/*
+? >
+<html>
+<head>
+< !-- meta http-equiv="refresh" content="10;url=<?=$url?>" /-- >
+</head>
+<body>
+<a href="<?=$url?>"><?=$url?></a>
+</body>
+</html>
+< ? php
+*/
   exit();
 }
 
 if ( filter_input(INPUT_GET,'state') !== $_SESSION['oauth_state'] ) {
+ /*
+ echo "<pre>\n";
+ echo "state: [".filter_input(INPUT_GET,'state')."]\n";
+ echo "oauth_state: [".$_SESSION['oauth_state']."]\n";
+ echo "kem: [".$kem."]\n";
+ echo "sessid: [".session_id()."]\n";
+ echo "\n</pre>";
+ */
  exit('Invalid state');
 }
 
@@ -67,20 +110,34 @@ $response = json_decode($result, true);
 
 /*============================*/
 
+$pvalor = $response['access_token'];
+
+$pcodpes = intval($_SESSION['dadosusp']['nusp']);
+
+/*
+echo "<pre>\n";
+echo "B. olha o OA2ORC_TOKEN_URL:[".OA2ORC_TOKEN_URL."]\n";
+echo "B. olha o ORCID_PRODUCTION:[".ORCID_PRODUCTION."]\n";
+echo "B. olha a url post:[".http_build_query(array(
+    'code' => filter_input(INPUT_GET,'code'),
+    'grant_type' => 'authorization_code',
+    'client_id' => OA2ORC_CLIENT_ID,
+    'client_secret' => OA2ORC_CLIENT_SECRET
+  ))."]\n";
+echo "B. olha o pvalor:[".$pvalor."]\n";
+print_r($response);
+print_r($_SESSION);
+echo "\n</pre>";
+exit;
+*/
+
+/*============================*/
+
 $sqlqry = "BEGIN perfil_sibi.isola_identificador(:pcodpes,'ORCIDTOKACC',:pvalor); END;";
 
 $stid = oci_parse($conn, $sqlqry);
 if(!$stid){ exit; }
 
-/*
-echo "<pre>\n";
-print_r($response);
-echo "\n</pre>";
-exit;
-*/
-
-$pcodpes = intval($_SESSION['dadosusp']['nusp']);
-$pvalor = $response['access_token'];
 oci_bind_by_name($stid,':pcodpes',$pcodpes);
 oci_bind_by_name($stid,':pvalor',$pvalor);
 
@@ -115,7 +172,7 @@ if(isset($_SESSION['OA2ORCBACKURL'])){
   unset($_SESSION['OA2ORCBACKURL']);
 }
 else {
-  $tmpOA2ORCBACKURL = OA2ORCBACKURL;
+  $tmpOA2ORCBACKURL = $orcbackurl;
 }
 // header('Location: '.$tmpOA2ORCBACKURL);
 
