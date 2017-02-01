@@ -7,7 +7,7 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
 
-if(strlen(filter_input(INPUT_GET,'code')) === 0) {
+if(strlen((string) filter_input(INPUT_GET,'code')) === 0) {
 	include('config.php');
 	ini_set('session.save_handler','memcached');
 	ini_set('session.save_path',MEMCACHESRVR.':'.MEMCACHEPORT);
@@ -174,7 +174,8 @@ if(isset($_SESSION['OA2ORCBACKURL'])){
 else {
   $tmpOA2ORCBACKURL = $orcbackurl;
 }
-// header('Location: '.$tmpOA2ORCBACKURL);
+header('Location: '.$tmpOA2ORCBACKURL);
+exit;
 
 ?>
 <html>
