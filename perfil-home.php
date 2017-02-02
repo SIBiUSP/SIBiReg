@@ -109,7 +109,8 @@ oci_close($conn);
 	var oauthWindow;
 
 	function openORCID() {
-	    var oauthWindow = window.open("orcid.php", "_blank", "toolbar=no, scrollbars=yes, width=580, height=" + (outerHeight*0.8) + ", top=" + (screenY + (outerHeight - innerHeight)*0.2) + ", left=" + (screenX + (innerWidth - 580)*0.5));
+	    // var oauthWindow = window.open("orcid.php", "_blank", "toolbar=no, scrollbars=yes, width=580, height=" + (outerHeight*0.8) + ", top=" + (screenY + (outerHeight - innerHeight)*0.2) + ", left=" + (screenX + (innerWidth - 580)*0.5));
+	    location.href="orcid.php";
 	}
 	</script>
     </head>
