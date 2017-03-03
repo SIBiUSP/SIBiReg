@@ -108,6 +108,8 @@ curl_setopt_array($curl, array(
 $result = curl_exec($curl);
 $response = json_decode($result, true);
 
+$porcid =  $response['orcid'];
+
 /*============================*/
 
 $pvalor = $response['access_token'];
@@ -174,10 +176,18 @@ if(isset($_SESSION['OA2ORCBACKURL'])){
 else {
   $tmpOA2ORCBACKURL = $orcbackurl;
 }
-header('Location: '.$tmpOA2ORCBACKURL);
+
+$agourl = parse_url($tmpOA2ORCBACKURL);
+parse_str($agourl['query'],$agoparms);
+
+header('Location: '.(array_key_exists('scheme',$agourl)?$agourl['scheme'].':':'').'//'.$agourl['host'].$agourl['path'].'?'.http_build_query(array_merge($agoparms,array(
+		'orcid' => $porcid ,
+		'nome' => $_SESSION['dadosusp']['nome']
+      ))));
+
 exit;
 
-?>
+/*
 <html>
 <head>
 <script language="javascript">
@@ -197,3 +207,4 @@ function autoload(){
 <body onload="autoload();" >
 </body>
 </html>
+*/
