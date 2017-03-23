@@ -9,16 +9,14 @@
     </head>
     <body>
 <?php include 'inc/header.inc' ?>
-    <h1>
-            Registro SIBi
-            </h1>
+    <h1> Registro SIBi </h1>
             <ul>
-            <li> <a href='perfil-home.php'>Perfil SIBi USP</a>
-            <?php
+            <li> <a href='perfil-home.php'>Perfil SIBi USP</a> </li>
+            <li> <a href='pesquisa-home.php'>Pesquisa USP</a> </li>
+	    <?php
 	    /*
 	    <!--
-	    <li> <a href='pesquisa-home.php'>Pesquisa USP</a>
-            <li> Listagens - Dedalus
+            <li> Listagens - Dedalus	    
 	    -->
 	    */
 	    ?>
