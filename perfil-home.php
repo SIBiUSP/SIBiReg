@@ -150,7 +150,7 @@ if(array_key_exists('ORCID',$rperfil)){
 ?>
 		</ul>
 		<br/>
-		<a href="autentica.php?logout=perfil-inicio.php">sair</a>
+		<a href="autentica/saml.php?logout=../perfil-inicio.php">sair</a>
 		<br/><br/><br/><br/><br/>
 		<h6>
 		Problemas? Envie um e-mail para <a href="mailto:atendimento@sibi.usp.br">atendimento@sibi.usp.br</a>.
