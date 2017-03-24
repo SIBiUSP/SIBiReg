@@ -169,6 +169,6 @@ print_r($rperfil);
 </html>
 <?php
 } else {
-  header('Location: autentica.php?logout=perfil-inicio.php');
+  header('Location: autentica/saml.php?logout=../perfil-inicio.php');
   exit;
 } ?>
