@@ -64,6 +64,10 @@ if($thisplace === $runningplace){
 		}
 		session_start();
 
+		if(!isset($_SESSION['OA1USP_CALLBACK_ID'])){
+			$_SESSION['OA1USP_CALLBACK_ID'] = OA1USP_CALLBACK_ID;
+		}
+
 		if(!isset($_SESSION['dadosusp'])){
 			try {
 				$req_url = OA1USP_REQUEST_URL;
@@ -72,34 +76,32 @@ if($thisplace === $runningplace){
 				$api_url = OA1USP_API_URL;
 				$conskey = OA1USP_CLIENT_KEY;
 				$conssec = OA1USP_CLIENT_SECRET;
-				// $callback_id = OA1USP_CALLBACK_ID;
-				$callback_id = 7;
+				$callback_id = $_SESSION['OA1USP_CALLBACK_ID'];
 
 				$oauth = new OAuth($conskey,$conssec,OAUTH_SIG_METHOD_HMACSHA1,OAUTH_AUTH_TYPE_URI);
 				$oauth->enableDebug();
 	
-				if(!isset($_SESSION['oa1usp_secret'])) {
+				$tmpty = filter_input(INPUT_GET,'oauth_token');
+				if(strlen($tmpty)>0) {
+					$oauth->setToken(filter_input(INPUT_GET,'oauth_token'),$_SESSION['oa1usp_secret']);
+					$access_token_info = $oauth->getAccessToken($acc_url, NULL, NULL, 'POST');
+					$_SESSION['oa1usp_token'] = $access_token_info['oauth_token'];
+					$_SESSION['oa1usp_secret'] = $access_token_info['oauth_token_secret'];
+					$oauth->setToken($_SESSION['oa1usp_token'],$_SESSION['oa1usp_secret']);
+					$oauth->fetch($api_url, NULL, 'POST');
+					$dadosusp = json_decode($oauth->getLastResponse());
+					if(isset($dadosusp)){
+					   $_SESSION['oa1usp_dadosusp'] = $dadosusp;
+					   $_SESSION['dadosusp']['nusp'] = $_SESSION['oa1usp_dadosusp']->loginUsuario;
+					   $_SESSION['dadosusp']['nome'] = $_SESSION['oa1usp_dadosusp']->nomeUsuario;
+					}
+				}
+				else {
 					$request_token_info = $oauth->getRequestToken($req_url,$callback_id,'POST');
 					$_SESSION['oa1usp_secret'] = $request_token_info['oauth_token_secret'];
 					$targeturl = $authurl.'?oauth_token='.$request_token_info['oauth_token'].'&callback_id='.$callback_id;
 					header('Location: '.$targeturl);
 					exit;
-				} else {
-					$tmpty = filter_input(INPUT_GET,'oauth_token');
-					if(strlen($tmpty)>0) {
-						$oauth->setToken(filter_input(INPUT_GET,'oauth_token'),$_SESSION['oa1usp_secret']);
-						$access_token_info = $oauth->getAccessToken($acc_url, NULL, NULL, 'POST');
-						$_SESSION['oa1usp_token'] = $access_token_info['oauth_token'];
-						$_SESSION['oa1usp_secret'] = $access_token_info['oauth_token_secret'];
-						$oauth->setToken($_SESSION['oa1usp_token'],$_SESSION['oa1usp_secret']);
-						$oauth->fetch($api_url, NULL, 'POST');
-						$dadosusp = json_decode($oauth->getLastResponse());
-						if(isset($dadosusp)){
-						   $_SESSION['oa1usp_dadosusp'] = $dadosusp;
-						   $_SESSION['dadosusp']['nusp'] = $_SESSION['oa1usp_dadosusp']->loginUsuario;
-						   $_SESSION['dadosusp']['nome'] = $_SESSION['oa1usp_dadosusp']->nomeUsuario;
-						}
-					}
 				}
 
 			} catch(OAuthException $E) {
@@ -124,6 +126,8 @@ else {
 		session_id($kem);
 	}
 	session_start();
+
+	$_SESSION['OA1USP_CALLBACK_ID'] = OA1USP_CALLBACK_ID;
 
 	if(isset($_SESSION['dadosusp'])){
 			
