@@ -4,7 +4,7 @@ ini_set('display_startup_errors', 1);
 ini_set('display_errors', 1);
 error_reporting(-1);
 
-include(dirname(__FILE__).'/../config.php');
+include('config.php');
 
 if(session_status() === PHP_SESSION_ACTIVE){
     /*
@@ -18,7 +18,7 @@ if(session_status() === PHP_SESSION_ACTIVE){
     exit;
 }
 
-$runningplace = OA1USP_RUNNINGPLACE;
+$runningplace = SAMLUSP_RUNNINGPLACE;
 
 $scheme = (array_key_exists('HTTPS',$_SERVER)?'https':'http');
 $thisplace = $scheme.'://'.filter_input(INPUT_SERVER,'HTTP_HOST').filter_input(INPUT_SERVER,'SCRIPT_NAME').filter_input(INPUT_SERVER,'PATH_INFO');
@@ -55,7 +55,16 @@ if($thisplace === $runningplace){
 		}
 	}
 	else { 
-	
+		require_once('/var/simplesamlphp/lib/_autoload.php');
+		$as = new SimpleSAML_Auth_Simple('default-sp');
+		$as->requireAuth();
+		$dadosusp = $as->getAttributes();
+
+		$sssess = SimpleSAML_Session::getSessionFromRequest();
+		$sssess->cleanup();
+
+		session_destroy();
+					
 		ini_set('session.save_handler','memcached');
 		ini_set('session.save_path',MEMCACHESRVR.':'.MEMCACHEPORT);
 		$kem = filter_input(INPUT_GET,'kem');
@@ -63,56 +72,17 @@ if($thisplace === $runningplace){
 			session_id($kem);
 		}
 		session_start();
-
-		if(!isset($_SESSION['dadosusp'])){
-			try {
-				$req_url = OA1USP_REQUEST_URL;
-				$authurl = OA1USP_AUTHORIZE_URL;
-				$acc_url = OA1USP_ACCESSTOKEN_URL;
-				$api_url = OA1USP_API_URL;
-				$conskey = OA1USP_CLIENT_KEY;
-				$conssec = OA1USP_CLIENT_SECRET;
-				// $callback_id = OA1USP_CALLBACK_ID;
-				$callback_id = 7;
-
-				$oauth = new OAuth($conskey,$conssec,OAUTH_SIG_METHOD_HMACSHA1,OAUTH_AUTH_TYPE_URI);
-				$oauth->enableDebug();
-	
-				if(!isset($_SESSION['oa1usp_secret'])) {
-					$request_token_info = $oauth->getRequestToken($req_url,$callback_id,'POST');
-					$_SESSION['oa1usp_secret'] = $request_token_info['oauth_token_secret'];
-					$targeturl = $authurl.'?oauth_token='.$request_token_info['oauth_token'].'&callback_id='.$callback_id;
-					header('Location: '.$targeturl);
-					exit;
-				} else {
-					$tmpty = filter_input(INPUT_GET,'oauth_token');
-					if(strlen($tmpty)>0) {
-						$oauth->setToken(filter_input(INPUT_GET,'oauth_token'),$_SESSION['oa1usp_secret']);
-						$access_token_info = $oauth->getAccessToken($acc_url, NULL, NULL, 'POST');
-						$_SESSION['oa1usp_token'] = $access_token_info['oauth_token'];
-						$_SESSION['oa1usp_secret'] = $access_token_info['oauth_token_secret'];
-						$oauth->setToken($_SESSION['oa1usp_token'],$_SESSION['oa1usp_secret']);
-						$oauth->fetch($api_url, NULL, 'POST');
-						$dadosusp = json_decode($oauth->getLastResponse());
-						if(isset($dadosusp)){
-						   $_SESSION['oa1usp_dadosusp'] = $dadosusp;
-						   $_SESSION['dadosusp']['nusp'] = $_SESSION['oa1usp_dadosusp']->loginUsuario;
-						   $_SESSION['dadosusp']['nome'] = $_SESSION['oa1usp_dadosusp']->nomeUsuario;
-						}
-					}
-				}
-
-			} catch(OAuthException $E) {
-				print_r($E);
-				exit;
-			}
+		
+		if(isset($dadosusp)){
+			$_SESSION['saml_dadosusp'] = $dadosusp;
+			$_SESSION['dadosusp']['nome'] = $_SESSION['saml_dadosusp']['urn:oid:2.5.4.3'][0];
+			$_SESSION['dadosusp']['nusp'] = $_SESSION['saml_dadosusp']['urn:oid:2.16.840.1.113730.3.1.3'][0];
 		}
-
+		
 		if(isset($_SESSION['retorno'])){
 			header('Location: '.$_SESSION['retorno']);
 			exit;
 		}
-		
 	}
 }
 else {
@@ -146,15 +116,14 @@ else {
 	}
 	else {
 		if(!isset($_SESSION['retorno'])){
-
-			$kem = session_id();
-
 			$_SESSION['retorno'] = $scheme.'://'.filter_input(INPUT_SERVER,'HTTP_HOST').filter_input(INPUT_SERVER,'REQUEST_URI');
-			
-			header('Location: '.$runningplace.'?kem='.$kem );
-			exit;
-
 		}
+
+		$kem = session_id();
+
+		header('Location: '.$runningplace.'?kem='.$kem );
+		exit;
+
 	}
 
 }

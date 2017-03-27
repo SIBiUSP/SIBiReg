@@ -6,7 +6,7 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-include('autentica/saml.php');
+include('autentica-saml.php');
 include('config.php');
 
 ini_set("display_errors", 1);
@@ -150,7 +150,7 @@ if(array_key_exists('ORCID',$rperfil)){
 ?>
 		</ul>
 		<br/>
-		<a href="autentica/saml.php?logout=../perfil-inicio.php">sair</a>
+		<a href="autentica-saml.php?logout=perfil-inicio.php">sair</a>
 		<br/><br/><br/><br/><br/>
 		<h6>
 		Problemas? Envie um e-mail para <a href="mailto:atendimento@sibi.usp.br">atendimento@sibi.usp.br</a>.
@@ -169,6 +169,6 @@ print_r($rperfil);
 </html>
 <?php
 } else {
-  header('Location: autentica/saml.php?logout=../perfil-inicio.php');
+  header('Location: autentica-saml.php?logout=perfil-inicio.php');
   exit;
 } ?>

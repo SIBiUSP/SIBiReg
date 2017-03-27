@@ -1,12 +1,3 @@
-<?php
-
-// phpinfo();
-// exit;
-
-// $HOMEBASE = 'perfil-inicio.php';
-// include('saml.php');
-
-?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -24,7 +15,7 @@
             <br>
 
             <ul>
-             <li>Acesse aqui e veja ou gerencie seus dados: <a href="perfil-home.php?login=yes"> Perfil SIBi-USP </a>
+             <li>Acesse aqui e veja ou gerencie seus dados: <a href="perfil-home.php?login=yes"> Perfil SIBi-USP </a></li>
             </ul>
 
         </div>

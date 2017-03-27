@@ -1,12 +1,3 @@
-<?php
-
-// phpinfo();
-// exit;
-
-// $HOMEBASE = 'pesquisa-inicio.php';
-// include('saml.php');
-
-?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -24,7 +15,7 @@
             <br>
 
             <ul>
-             <li>Acesse aqui para pesquisar vínculos USP: <a href="pesquisa-home.php?login=yes"> pesquisa USP </a>
+             <li>Acesse aqui para pesquisar vínculos USP: <a href="pesquisa-home.php?login=yes"> pesquisa USP </a></li>
             </ul>
 
         </div>

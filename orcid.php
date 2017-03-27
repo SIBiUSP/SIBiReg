@@ -19,7 +19,7 @@ if(strlen((string) filter_input(INPUT_GET,'code')) === 0) {
 	include('config.php');
 }
 else {
-	include('autentica/saml.php');
+	include('autentica-saml.php');
 	include('config.php');
 }
 

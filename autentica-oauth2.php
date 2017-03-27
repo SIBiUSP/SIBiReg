@@ -4,7 +4,7 @@ ini_set('display_startup_errors', 1);
 ini_set('display_errors', 1);
 error_reporting(-1);
 
-include(dirname(__FILE__).'/../config.php');
+include('config.php');
 
 if(session_status() === PHP_SESSION_ACTIVE){
     /*
@@ -18,9 +18,7 @@ if(session_status() === PHP_SESSION_ACTIVE){
     exit;
 }
 
-if(!defined('SAMLUSP_RUNNINGPLACE')){ echo 'eita'; exit; };
-
-$runningplace = SAMLUSP_RUNNINGPLACE;
+$runningplace = OA2USP_RUNNINGPLACE;
 
 $scheme = (array_key_exists('HTTPS',$_SERVER)?'https':'http');
 $thisplace = $scheme.'://'.filter_input(INPUT_SERVER,'HTTP_HOST').filter_input(INPUT_SERVER,'SCRIPT_NAME').filter_input(INPUT_SERVER,'PATH_INFO');
@@ -56,35 +54,65 @@ if($thisplace === $runningplace){
 			exit;
 		}
 	}
-	else { 
-		require_once('/var/simplesamlphp/lib/_autoload.php');
-		$as = new SimpleSAML_Auth_Simple('default-sp');
-		$as->requireAuth();
-		$dadosusp = $as->getAttributes();
-
-		$sssess = SimpleSAML_Session::getSessionFromRequest();
-		$sssess->cleanup();
-
-		session_destroy();
-					
+	else {
+/*
 		ini_set('session.save_handler','memcached');
 		ini_set('session.save_path',MEMCACHESRVR.':'.MEMCACHEPORT);
 		$kem = filter_input(INPUT_GET,'kem');
-		if(strlen($kem) > 0){
+		if(!empty($kem)){
 			session_id($kem);
 		}
 		session_start();
-		
+
+		if (ORCID_PRODUCTION) {
+		  define('OA2ORC_AUTHORIZATION_URL', 'https://orcid.org/oauth/authorize');
+		  //define('OA2ORC_TOKEN_URL', 'https://pub.orcid.org/oauth/token'); // public
+		  define('OA2ORC_TOKEN_URL', 'https://api.orcid.org/oauth/token'); // members
+		} else {
+		  define('OA2ORC_AUTHORIZATION_URL', 'https://sandbox.orcid.org/oauth/authorize');
+		  //define('OA2ORC_TOKEN_URL', 'https://pub.sandbox.orcid.org/oauth/token'); // public
+		  define('OA2ORC_TOKEN_URL', 'https://api.sandbox.orcid.org/oauth/token'); // members
+		}
+
+		if(strlen(filter_input(INPUT_GET,'code')) === 0) {
+		  $state = bin2hex(openssl_random_pseudo_bytes(16));
+		  setcookie('oauth_state', $state, time() + 3600, null, null, false, true);
+		  $_SESSION['oauth_state'] = bin2hex(openssl_random_pseudo_bytes(16));
+		  $url = OA2ORC_AUTHORIZATION_URL . '?' . http_build_query(array(
+		      'response_type' => 'code',
+		      'client_id' => OA2ORC_CLIENT_ID,
+		      'redirect_uri' => OA2ORC_REDIRECT_URI,
+		      'scope' => '/authenticate',
+		      'state' => $_SESSION['oauth_state']
+		  ));
+		  header('Location: ' . $url);
+		  exit();
+		}
+
+		if ( filter_input(INPUT_GET,'state') !== $_SESSION['oauth_state'] ) {
+		 exit('Invalid state');
+		}
+
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+		  CURLOPT_URL => OA2ORC_TOKEN_URL,
+		  CURLOPT_RETURNTRANSFER => true,
+		  CURLOPT_HTTPHEADER => array('Accept: application/json'),
+		  CURLOPT_POST => true,
+		  CURLOPT_POSTFIELDS => http_build_query(array(
+		    'code' => filter_input(INPUT_GET,'code'),
+		    'grant_type' => 'authorization_code',
+		    'client_id' => OA2ORC_CLIENT_ID,
+		    'client_secret' => OA2ORC_CLIENT_SECRET
+		  ))
+		));
+		$result = curl_exec($curl);
+		$dadosusp = json_decode($result, true);
 		if(isset($dadosusp)){
-			$_SESSION['saml_dadosusp'] = $dadosusp;
-			$_SESSION['dadosusp']['nome'] = $_SESSION['saml_dadosusp']['urn:oid:2.5.4.3'][0];
-			$_SESSION['dadosusp']['nusp'] = $_SESSION['saml_dadosusp']['urn:oid:2.16.840.1.113730.3.1.3'][0];
+			$_SESSION['oa2usp_dadosusp'] = $dadosusp;
+			$_SESSION['dadosusp']['orcid'] = $_SESSION['oa2usp_dadosusp']['orcid'];
 		}
-		
-		if(isset($_SESSION['retorno'])){
-			header('Location: '.$_SESSION['retorno']);
-			exit;
-		}
+*/
 	}
 }
 else {
