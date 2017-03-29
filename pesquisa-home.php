@@ -32,9 +32,9 @@ if(isset($_SESSION['dadosusp']['nusp'])){
             </h1>
             <br>
 	<ul>
-	 <li><a href="uspvw">uspvw</a></li>
-	 <li><a href="anuario">anuario</a></li>
-	 <li><a href="biomedc">analise de duplicados da Biomed Central (itens recebidos via SWORD)</a></li>
+	 <li><a href="pesquisa-uspvw-home.php">Pesquisas - base USP</a></li>
+	 <li><a href="pesquisa-anuario-home.php">BDPI - anuario</a></li>
+	 <li><a href="pesquisa-biomedc-home.php">BDPI - analise de duplicados da Biomed Central (itens recebidos via SWORD)</a></li>
 	</ul>
 	<br/>
 	<a href="autentica-oauth1.php?logout=pesquisa-inicio.php">sair</a>

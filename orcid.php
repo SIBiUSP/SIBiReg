@@ -6,7 +6,8 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-
+/* trecho comentado
+[INICIO do trecho para que não se exija autenticação prévia via USP]
 if(strlen((string) filter_input(INPUT_GET,'code')) === 0) {
 	include('config.php');
 	ini_set('session.save_handler','memcached');
@@ -19,9 +20,13 @@ if(strlen((string) filter_input(INPUT_GET,'code')) === 0) {
 	include('config.php');
 }
 else {
+[FIM do trecho para que não se exija autenticação prévia via USP]
+*/
 	include('autentica-saml.php');
 	include('config.php');
+/*
 }
+*/
 
 $currentBaseURL = (array_key_exists('HTTPS',$_SERVER)?'https':'http').'://'.filter_input(INPUT_SERVER,'HTTP_HOST').filter_input(INPUT_SERVER,'SCRIPT_NAME');
 

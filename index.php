@@ -9,17 +9,9 @@
     </head>
     <body>
 <?php include 'inc/header.inc' ?>
-    <h1> Registro SIBi </h1>
             <ul>
             <li> <a href='perfil-home.php'>Perfil SIBi USP</a> </li>
             <li> <a href='pesquisa-home.php'>Pesquisa USP</a> </li>
-	    <?php
-	    /*
-	    <!--
-            <li> Listagens - Dedalus	    
-	    -->
-	    */
-	    ?>
             </ul>
         </div>
     </body>
