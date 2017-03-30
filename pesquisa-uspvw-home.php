@@ -21,6 +21,7 @@ error_reporting(E_ALL);
 
 putenv("NLS_SORT=BINARY_AI");
 putenv("NLS_COMP=LINGUISTIC");
+putenv("NLS_LANG=BRAZILIAN PORTUGUESE_BRAZIL");
 
 $DEFAULT_LABEL = "NOMPES";
 $MAX_ROWNUM = "100";
