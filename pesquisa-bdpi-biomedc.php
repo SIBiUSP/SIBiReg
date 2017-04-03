@@ -22,6 +22,8 @@ $page = ((isset($_GET['page']) && is_numeric($_GET['page'])) ? (int) $_GET['page
 $limit = 1000;
 $offset = ($page * $limit);
 
+$bdpihostname = BDPI_HOSTNAME;
+
 $sibiocnxstr = DB_BDPI_CONNSTR;
 
 $conexao = pg_connect($sibiocnxstr) or die("Nao Conectado");
@@ -74,7 +76,7 @@ switch(true){
 
 	case (isset($_GET['biomedchid'])) :
 		$sqlqry1=<<<EOT
-		select '<a href="'||'/handle/BDPI/'||A.handle_id||'">'||A.handle_id||'</a>' handle_biomed_recebido_via_sword, '<a href="'||'/handle/BDPI/'||B.handle_id||'">'||B.handle_id||'</a>' handles_com_titulo_igual, A.titulo from
+		select '<a href="'||'http://${bdpihostname}/handle/BDPI/'||A.handle_id||'" target="_new">'||A.handle_id||'</a>' handle_biomed_recebido_via_sword, '<a href="'||'/handle/BDPI/'||B.handle_id||'">'||B.handle_id||'</a>' handles_com_titulo_igual, A.titulo from
 		(
 			select distinct handle.handle_id, text_value titulo
 			from metadatavalue

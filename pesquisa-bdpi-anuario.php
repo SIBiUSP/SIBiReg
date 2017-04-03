@@ -24,6 +24,8 @@ $offset = ($page * $limit);
 
 $sibiocnxstr = DB_BDPI_CONNSTR;
 
+$bdpihostname = BDPI_HOSTNAME;
+
 $conexao = pg_connect($sibiocnxstr) or die("Nao Conectado");
 
 $thisfilename = basename(__FILE__);
@@ -72,7 +74,7 @@ switch(true){
 
 	case (isset($_GET['mfidi']) && isset($_GET['tvl'])):
 		$sqlqry1=<<<EOT
-		select row_number() over () as linha, h.handle, 'http://www.producao.usp.br/handle/'||h.handle _ahref_
+		select row_number() over () as linha, h.handle, 'http://${bdpihostname}/handle/'||h.handle _ahref_
 		from item i
 		inner join (select distinct item_id from metadatavalue where metadata_field_id = $1 and text_value = $2) m on (m.item_id = i.item_id)
 		inner join handle h on (h.resource_id = i.item_id and h.resource_type_id = 2)
@@ -86,13 +88,13 @@ EOT
 	case (isset($_GET['mfidt']) && isset($_GET['mftt'])):
 		$sqlqry1=<<<EOT
 		select row_number() over (order by count(*) desc) as linha,
-		coalesce(m.text_value,'n/a') mftttit, '$thisfilename?mfidi='||m.metadata_field_id||'&tvl='||m.text_value _ahref_,  count(*) quantidade
+		coalesce(m.text_value,'n/a') mftttit, '${thisfilename}?mfidi='||m.metadata_field_id||'&tvl='||m.text_value _ahref_,  count(*) quantidade
 		from item i
 		inner join (select distinct item_id, text_value, metadata_field_id from metadatavalue where metadata_field_id = $1) m on m.item_id = i.item_id
 		where i.in_archive is true and i.withdrawn is false
 		group by m.text_value, m.metadata_field_id
 		order by quantidade desc
-		limit $limit offset $offset
+		limit ${limit} offset ${offset}
 EOT
 ;
 		$showh = tabula($conexao,$sqlqry1,array($_GET['mfidt']),array('mftttit' => $_GET['mftt']));
@@ -102,11 +104,11 @@ EOT
 		$sqlqry1=<<<EOT
 		select row_number() over (order by coalesce($1||'.'||element||'.'||qualifier,$1||'.'||element)) as linha,
 		       coalesce($1||'.'||element ||'.'||qualifier,$1||'.'||element) metadado,
-		       scope_note as nota_de_escopo, '$thisfilename?mfidt='||metadata_field_id||'&mftt='||coalesce($1||'.'||element ||'.'||qualifier,$1||'.'||element) _ahref_
+		       scope_note as nota_de_escopo, '{$thisfilename}?mfidt='||metadata_field_id||'&mftt='||coalesce($1||'.'||element ||'.'||qualifier,$1||'.'||element) _ahref_
 		from metadatafieldregistry
 		where metadata_schema_id = $2
 		order by metadado
-		limit $limit offset $offset
+		limit ${limit} offset ${offset}
 EOT
 ;
 		$showh = tabula($conexao,$sqlqry1,array($_GET['sit'],$_GET['sid']));
@@ -114,7 +116,7 @@ EOT
 
 	case (isset($_GET['navby']) && ($_GET['navby']=='metadados')) :
 		$sqlqry1=<<<EOT
-		select namespace, short_id id, '$thisfilename?sid='||metadata_schema_id||'&sit='||short_id as _ahref_
+		select namespace, short_id id, '${thisfilename}?sid='||metadata_schema_id||'&sit='||short_id as _ahref_
 		from metadataschemaregistry
 EOT
 ;
@@ -123,7 +125,7 @@ EOT
 	case (isset($_GET['cid']) && array_key_exists('ano',$_GET) && array_key_exists('intl',$_GET) && array_key_exists('txa',$_GET)) :
 		$sqlqry1=<<<EOT
 		select row_number() over (order by name, left(A.text_value,4), B.text_value asc) as linha,
-			community.name, left(A.text_value,4) ano, B.text_value intl, handle.handle, '/handle/'||handle.handle as _ahref_
+			community.name, left(A.text_value,4) ano, B.text_value intl, handle.handle, 'http://${bdpihostname}/handle/'||handle.handle as _ahref_
 		from community
 		inner join communities2item on communities2item.community_id = community.community_id
 		       left join metadatavalue A on (communities2item.item_id = A.item_id and A.metadata_field_id = 15)
@@ -143,7 +145,7 @@ EOT
 		$sqlqry1=<<<EOT
 		select community.name, left(A.text_value,4) ano,
 		       B.text_value intl, count(communities2item.item_id) q,
-		       '$thisfilename?cid='||community.community_id||'&ano='||coalesce(left(A.text_value,4),'')||'&intl='||coalesce(B.text_value,'')||'&txa=1' as _ahref_
+		       '${thisfilename}?cid='||community.community_id||'&ano='||coalesce(left(A.text_value,4),'')||'&intl='||coalesce(B.text_value,'')||'&txa=1' as _ahref_
 		from community
 		inner join communities2item on communities2item.community_id = community.community_id
 		       left join metadatavalue A on (communities2item.item_id = A.item_id and A.metadata_field_id = 15)
@@ -159,8 +161,8 @@ EOT
 	case (count($_GET) == 0) :
 		$sqlqry1=<<<EOT
 		select A.tipo, A._ahref_ from
-		(select 1 as lin, 'quantidade de trabalhos por ano (nacional/internacional)' as tipo, '$thisfilename?navby=qtrabxintlxano' as _ahref_
-		union select 3, 'navegar por metadados', '$thisfilename?navby=metadados'
+		(select 1 as lin, 'quantidade de trabalhos por ano (nacional/internacional)' as tipo, '${thisfilename}?navby=qtrabxintlxano' as _ahref_
+		union select 3, 'navegar por metadados', '${thisfilename}?navby=metadados'
 		union select 4, 'estatísticas do awstats', 'http://www.producao.usp.br/awstats/cgi-bin/awstats.pl') as A
 		order by A.lin
 EOT
@@ -239,7 +241,7 @@ function tabula($cons,$sqls,$arrs,$alls = array()){
 	  for($i=0; $i < count($pgr); $i++) {
 	     if($ahref > -1){
 	        if($ahref == $i) continue;
-		$arrout['outs'] .= "<td><a href='$pgr[$ahref]'>$pgr[$i]</a></td>\n";
+		$arrout['outs'] .= "<td><a href='$pgr[$ahref]' target='_new'>$pgr[$i]</a></td>\n";
 	     }
 	     else {
 		$arrout['outs'] .= '    <td>'.$pgr[$i].'</td>'."\n";

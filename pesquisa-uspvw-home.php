@@ -21,15 +21,15 @@ error_reporting(E_ALL);
 
 putenv("NLS_SORT=BINARY_AI");
 putenv("NLS_COMP=LINGUISTIC");
-putenv("NLS_LANG=BRAZILIAN PORTUGUESE_BRAZIL");
+putenv("NLS_LANG=BRAZILIAN PORTUGUESE_BRAZIL.UTF8");
 
 $DEFAULT_LABEL = "NOMPES";
-$MAX_ROWNUM = "100";
+define('MAX_ROWNUM',1000);
 
 if(array_key_exists('q',$_GET) && strlen($_GET['q'])>0){
 	$_SESSION['q']=html_entity_decode($_GET['q']);
-	header("Location: ".basename(__FILE__));
-	exit;
+	// header("Location: ".basename(__FILE__));
+	// exit;
 }
 
 $conn = oci_connect(DB_REPLICAUSP_USR, DB_REPLICAUSP_PWD, DB_REPLICAUSP_URL);
@@ -137,18 +137,29 @@ if(array_key_exists('q',$_SESSION) && strlen($_SESSION['q'])>0){
 
 	$out=array();
 	preg_match_all("/((\S+)\s*:\s*)?(\S+)/",$_SESSION['q'],$out,PREG_PATTERN_ORDER);
-	
+
+/*
+echo "\n<xmp>\n";
+print_r($out);
+echo "\n</xmp>\n";
+*/
 	for($ial=0;$ial<count($out[2]);$ial++){
 		$label = strtoupper($out[2][$ial] == "" ? $DEFAULT_LABEL : $out[2][$ial]);
 		if(array_key_exists($label,$collabels)){
 			array_push($collabels[$label]['where'],trim($out[3][$ial]," -.;,'\""));
 		}
 	}
-	
+
+/*
+echo "\n<xmp>\n";
+print_r($collabels);
+echo "\n</xmp>\n";
+*/	
 	// HTML TABLE HEADER
 	
 	print "<table border='0'>\n";
 	print "<thead><tr>";
+	print "<td>Linha</td>\n";
 	foreach($collabels as $collabel){
 		print "<th>".$collabel['label']."</th>";
 	}
@@ -157,10 +168,11 @@ if(array_key_exists('q',$_SESSION) && strlen($_SESSION['q'])>0){
 
 	//BUILD SQL EXPRESSION	
 
-	$sqlstrf = array();	
+	$sqlstrf = array();
 	$asqlqry = array();
 	$a_binds = array();
-	$licount = 7;
+	$licount = 7; // quantidade de critérios
+	$totlins = 0;
 	
 	for($licrit=0;$licrit<$licount;$licrit++){
 	
@@ -263,83 +275,93 @@ if(array_key_exists('q',$_SESSION) && strlen($_SESSION['q'])>0){
 					}
 				}
 				elseif($collabel['type'] === 'NUMBER'){
-					$i=0;
-					$bindvar="";
-					foreach($collabel['where'] as $clab){
-						if(is_numeric($clab)){
+					if(($licrit == 5) || ($licrit == 6)){
+						$i=0;
+						$bindvar="";
+						foreach($collabel['where'] as $clab){
+							if(is_numeric($clab)){
+								$bindvar = ':'.$collabel['label'].'_'.$i.'_'.$licrit;
+								array_push($al_qry," ".$collabel['name']." = ".$bindvar);
+								$a_binds[$bindvar] = $clab;
+								$i++;
+							}
+						}
+						unset($bindvar);
+						unset($i);
+					}
+				}
+				else {
+					if($licrit == 0){
+						$i=0;
+						$bindvar="";
+						foreach($collabel['where'] as $clab){
 							$bindvar = ':'.$collabel['label'].'_'.$i.'_'.$licrit;
 							array_push($al_qry," ".$collabel['name']." = ".$bindvar);
 							$a_binds[$bindvar] = $clab;
 							$i++;
 						}
+						unset($bindvar);
+						unset($i);
 					}
-					unset($bindvar);
-					unset($i);
-				}
-				else {
-					$i=0;
-					$bindvar="";
-					foreach($collabel['where'] as $clab){
-						$bindvar = ':'.$collabel['label'].'_'.$i.'_'.$licrit;
-						array_push($al_qry," ".$collabel['name']." = ".$bindvar);
-						$a_binds[$bindvar] = $clab;
-						$i++;
-					}
-					unset($bindvar);
-					unset($i);
 				}
 			}
 		}
 		
 		if(count($al_qry)>0){
-			array_push($asqlqry, implode(" AND ", $al_qry));
+			array_push($asqlqry, "(".implode(" AND ", $al_qry).")");
+			
 			/*
-			?><xmp><?php
+			echo "<xmp>\n";			
 			echo "passaqui $licrit\n";
 			print_r($al_qry);
 			echo "\n";
 			echo $asqlqry[$licrit]."\n\n";
-			echo "<br>\n<br>\n";
-			?></xmp><?php
+			echo "<br></xmp>\n<br>\n";
 			*/
+
+
+			$sqlstrf[$licrit] = $sqlqry;
+		
+			if(count($asqlqry)==0){
+				$sqlstrf[$licrit] = str_replace("WHERE_EXPRESSION"," WHERE ROWNUM < 1",$sqlstrf[$licrit]);
+			}
+			else {
+				$not_w = "";
+				if(count($asqlqry) > 1){
+					$not_w = implode(" OR ",array_slice($asqlqry,0,count($asqlqry)-1));
+					// echo "passaqui: $not_w, ".print_r($asqlqry);
+				}
+				if(strlen(trim($not_w))>0){
+					$sqlstrf[$licrit] = str_replace("WHERE_EXPRESSION"," WHERE ".$asqlqry[count($asqlqry)-1]." AND NOT (".$not_w.") AND ROWNUM <= ".MAX_ROWNUM,$sqlstrf[$licrit]);
+				}
+				else {
+					$sqlstrf[$licrit] = str_replace("WHERE_EXPRESSION"," WHERE ".$asqlqry[count($asqlqry)-1]." AND ROWNUM <= ".MAX_ROWNUM,$sqlstrf[$licrit]);
+				}
+			}
+		
+			$sqlstrf[$licrit] = str_replace("ORDERINGCOWS",$sqlorderingcols,$sqlstrf[$licrit]);
+		
+			// a_binds[':QRYSTR']=trim(implode(' ',$collabels['NOMPES']['where']));
+
+			fsqltabletr($sqlstrf[$licrit].' '.$sqlorderby,$conn,$a_binds,$ncols);
+			flush();
+
+			
 		}
 		
 		unset($al_qry);
-		
-		$sqlstrf[$licrit] = $sqlqry;
-		
-		if(count($asqlqry)==0){
-			$sqlstrf[$licrit] = str_replace("WHERE_EXPRESSION"," WHERE ROWNUM < 1",$sqlstrf[$licrit]);
-		}
-		else {
-			$not_w = "";
-			if(count($asqlqry) > 0){
-				$not_w = implode(" OR ",array_slice($asqlqry,0,count($asqlqry)-1));
-				// echo "passaqui: $not_w, ".print_r($asqlqry);
-			}
-			if(strlen(trim($not_w))>0){
-				$sqlstrf[$licrit] = str_replace("WHERE_EXPRESSION"," WHERE ".$asqlqry[count($asqlqry)-1]." AND NOT (".$not_w.") AND ROWNUM < $MAX_ROWNUM",$sqlstrf[$licrit]);
-			}
-			else {
-				$sqlstrf[$licrit] = str_replace("WHERE_EXPRESSION"," WHERE ".$asqlqry[count($asqlqry)-1]." AND ROWNUM < $MAX_ROWNUM",$sqlstrf[$licrit]);
-			}
-		}
-		
-		$sqlstrf[$licrit] = str_replace("ORDERINGCOWS",$sqlorderingcols,$sqlstrf[$licrit]);
-		
-		// a_binds[':QRYSTR']=trim(implode(' ',$collabels['NOMPES']['where']));
-
-		fsqltabletr($sqlstrf[$licrit].' '.$sqlorderby,$conn,$a_binds,$ncols);
-		flush();
 	}
 
 	print "</tbody></table><br>\n";
 
-/*
-	?><xmp><?php
+	echo "<xmp>\n";
+        echo "[sqlstrf:\n";
 	print_r($sqlstrf);
-	?></xmp><?php
-*/
+	echo "\n]\n";
+        echo "[a_binds:\n";
+	print_r($a_binds);
+	echo "\n]FIM\n";
+	echo "</xmp>\n";
 
 	unset($_SESSION['q']);
 
@@ -353,6 +375,12 @@ oci_close($conn);
 
 function fsqltabletr($t_sqlryf,$t_conn,$abinds,$qcols){ 
 
+	// echo "<!-- $t_sqlryf -->\n";
+
+	global $totlins;
+
+	if($totlins > MAX_ROWNUM) return true;
+
 	$ret = false;
 	$stid = oci_parse($t_conn, $t_sqlryf);
 	if(!$stid){ exit; }
@@ -365,15 +393,19 @@ function fsqltabletr($t_sqlryf,$t_conn,$abinds,$qcols){
 	if(!$r){ exit; }
 
 	while ($row = oci_fetch_array($stid, OCI_ASSOC+OCI_RETURN_NULLS)) {
-		print "<tr>\n";
-		$i=0;
-		foreach ($row as $item) {
-			$i++;
-			print "    <td>" . ($item !== null ? htmlentities($item, ENT_QUOTES) : "&nbsp;") . "</td>\n";
-			$ret = true;
-			if($i >= $qcols) break;
+		$totlins++;
+		if($totlins <= MAX_ROWNUM){
+			print "<tr>\n";
+			print "<td>".$totlins."</td>\n";
+			$i=0;
+			foreach ($row as $item) {
+				$i++;
+				print "    <td>" . ($item !== null ? htmlentities($item, ENT_QUOTES) : "&nbsp;") . "</td>\n";
+				$ret = true;
+				if($i >= $qcols) break;
+			}
+			print "</tr>\n";
 		}
-		print "</tr>\n";
 	}
 	
 	oci_free_statement($stid);
@@ -388,7 +420,7 @@ function fsqltabletr($t_sqlryf,$t_conn,$abinds,$qcols){
 1. a busca se dará por padrão na coluna do nome da pessoa (<b>NOMPES</b>);<br>
 2. use <b>nome_da_coluna</b>:<b>termo</b> para busca nas demais colunas (<?=implode(', ',array_keys($collabels))?>);<br>
 3. use <b>aspas</b> duplas ou simples cercando o <b>termo</b> caso desejada busca exata com espaços;<br>
-4. a quantidade de registros é <b>limitada em <?=$MAX_ROWNUM?></b>, buscas muito genéricas não retornarão todos os registros possíveis.
+4. a quantidade de registros é <b>limitada em <?=MAX_ROWNUM?></b>, buscas muito genéricas não retornarão todos os registros possíveis.
 </body>
 </html>
 <?php

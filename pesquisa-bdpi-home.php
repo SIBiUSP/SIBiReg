@@ -28,11 +28,14 @@ if(isset($_SESSION['dadosusp']['nusp'])){
     <body>
       <?php include 'inc/header.inc' ?>
             <h1>
-            Pesquisas
+            Pesquisas BDPI-USP
             </h1>
+	    <h6>
+	    <a href='http://www.producao.usp.br' target='_new'><i>Biblioteca Digital da Produção Intelectual - Universidade de São Paulo</i></a>
+	    </h6>
 	<ul>
-	 <li><a href="pesquisa-uspvw-home.php">USP - base réplica</a></li>
-	 <li><a href="pesquisa-bdpi-home.php">BDPI</a></li>
+	 <li><a href="pesquisa-bdpi-anuario.php">BDPI - anuario</a></li>
+	 <li><a href="pesquisa-bdpi-biomedc.php">BDPI - analise de duplicados da Biomed Central (itens recebidos via SWORD)</a></li>
 	</ul>
 	<br/>
 	<a href="autentica-oauth1.php?logout=pesquisa-inicio.php">sair</a>
