@@ -26,67 +26,12 @@ putenv("NLS_LANG=BRAZILIAN PORTUGUESE_BRAZIL.UTF8");
 $DEFAULT_LABEL = "NOMPES";
 define('MAX_ROWNUM',1000);
 
+$collabels = array();
+
 if(array_key_exists('q',$_GET) && strlen($_GET['q'])>0){
 	$_SESSION['q']=html_entity_decode($_GET['q']);
-	// header("Location: ".basename(__FILE__));
-	// exit;
-}
-
-$conn = oci_connect(DB_REPLICAUSP_USR, DB_REPLICAUSP_PWD, DB_REPLICAUSP_URL);
-if(!$conn){ exit; }
-
-$sqlqry=<<<EOT
-SELECT VIEW_BDPI.* ORDERINGCOWS
-FROM VIEW_BDPI
-WHERE_EXPRESSION
-EOT
-;
-
-// utl_match.jaro_winkler_similarity(nvl(:QRYSTR,lower(nompes)),lower(nompes)) A,
-// decode(substr(lower(t ipvin),0,4),'exte',1,'auto',1,'insc',2,'cand',2,'depe',3,0) B,
-// decode(substr(decode(lower(t ipfnc),'docente','docente',lower(t ipvin)),0,5),'docen',0,'aluno',1,'servi',2,3) F,
-// decode(lower(t ipmer),'ms-6',0,'ms-5',1,'ms-4',2,'ms-3',3,'ms-2',4,'ms-1',5,'pc 1',6,'pc 2',7,'pc 3',8) G,
-
-$sqlorderingcols=<<<EOT
-,
-nvl(dtafim,to_date('2199','YYYY')) C,
-nvl2(sitctousp,decode(lower(sitctousp),'ativado',0,1),0) D,
-decode(sitatl,'A',0,'P',1,'D',2,3) E,
-numseqpgm H
-EOT
-;
-
-// A desc,
-// B,
-// F,
-// G,
-$sqlorderby=<<<EOT
-order by
-C desc,
-D,
-E,
-H desc
-EOT
-;
-
-// (case when nvl(dtafim,to_date('2199','YYYY')) > sysdate AND dtaini < sysdate then 0 else 1 end),
-$sqlqrylabels = $sqlqry;
-$sqlqrylabels = str_replace("WHERE_EXPRESSION"," WHERE rownum < 1",$sqlqrylabels);
-$sqlqrylabels = str_replace("ORDERINGCOWS","",$sqlqrylabels);
-
-$stid = oci_parse($conn, $sqlqrylabels);
-if(!$stid){ exit; }
-
-$r=oci_execute($stid);
-if(!$r){ exit; }
-
-$collabels = array();
-$ncols = oci_num_fields($stid);
-for($i = 1; $i <= $ncols; $i++){
-	$collabels[strtoupper(oci_field_name($stid,$i))]['label']=oci_field_name($stid,$i);
-	$collabels[strtoupper(oci_field_name($stid,$i))]['name']=oci_field_name($stid,$i);
-	$collabels[strtoupper(oci_field_name($stid,$i))]['type']=oci_field_type($stid,$i);
-	$collabels[strtoupper(oci_field_name($stid,$i))]['where']=array();
+	header("Location: ".basename(__FILE__));
+	exit;
 }
 
 ?>
@@ -131,18 +76,78 @@ for($i = 1; $i <= $ncols; $i++){
 </form>
 <?php
 
-oci_free_statement($stid);
-
 if(array_key_exists('q',$_SESSION) && strlen($_SESSION['q'])>0){
 
-	$out=array();
-	preg_match_all("/((\S+)\s*:\s*)?(\S+)/",$_SESSION['q'],$out,PREG_PATTERN_ORDER);
 
+	$conn = oci_connect(DB_REPLICAUSP_USR, DB_REPLICAUSP_PWD, DB_REPLICAUSP_URL);
+	if(!$conn){ exit; }
+
+	$sqlqry=<<<EOT
+SELECT VIEW_BDPI.* ORDERINGCOWS
+FROM VIEW_BDPI
+WHERE_EXPRESSION
+EOT
+;
+
+	// utl_match.jaro_winkler_similarity(nvl(:QRYSTR,lower(nompes)),lower(nompes)) A,
+	// decode(substr(lower(t ipvin),0,4),'exte',1,'auto',1,'insc',2,'cand',2,'depe',3,0) B,
+	// decode(substr(decode(lower(t ipfnc),'docente','docente',lower(t ipvin)),0,5),'docen',0,'aluno',1,'servi',2,3) F,
+	// decode(lower(t ipmer),'ms-6',0,'ms-5',1,'ms-4',2,'ms-3',3,'ms-2',4,'ms-1',5,'pc 1',6,'pc 2',7,'pc 3',8) G,
+
+	$sqlorderingcols=<<<EOT
+,
+nvl(dtafim,to_date('2199','YYYY')) C,
+nvl2(sitctousp,decode(lower(sitctousp),'ativado',0,1),0) D,
+decode(sitatl,'A',0,'P',1,'D',2,3) E,
+numseqpgm H
+EOT
+;
+
+	// A desc,
+	// B,
+	// F,
+	// G,
+	$sqlorderby=<<<EOT
+order by
+C desc,
+D,
+E,
+H desc
+EOT
+;
+
+	// (case when nvl(dtafim,to_date('2199','YYYY')) > sysdate AND dtaini < sysdate then 0 else 1 end),
+	$sqlqrylabels = $sqlqry;
+	$sqlqrylabels = str_replace("WHERE_EXPRESSION"," WHERE rownum < 1",$sqlqrylabels);
+	$sqlqrylabels = str_replace("ORDERINGCOWS","",$sqlqrylabels);
+
+	$stid = oci_parse($conn, $sqlqrylabels);
+	if(!$stid){ exit; }
+
+	$r=oci_execute($stid);
+	if(!$r){ exit; }
+
+	$collabels = array();
+	$ncols = oci_num_fields($stid);
+	for($i = 1; $i <= $ncols; $i++){
+		$collabels[strtoupper(oci_field_name($stid,$i))]['label']=oci_field_name($stid,$i);
+		$collabels[strtoupper(oci_field_name($stid,$i))]['name']=oci_field_name($stid,$i);
+		$collabels[strtoupper(oci_field_name($stid,$i))]['type']=oci_field_type($stid,$i);
+		$collabels[strtoupper(oci_field_name($stid,$i))]['where']=array();
+	}
+
+	oci_free_statement($stid);
+
+	$out=array();
+	preg_match_all("/((\S+)\s*:\s*)?(\S+|\\\".+\\\")/",$_SESSION['q'],$out,PREG_PATTERN_ORDER);
 /*
+RECHECK
+
 echo "\n<xmp>\n";
 print_r($out);
 echo "\n</xmp>\n";
 */
+
 	for($ial=0;$ial<count($out[2]);$ial++){
 		$label = strtoupper($out[2][$ial] == "" ? $DEFAULT_LABEL : $out[2][$ial]);
 		if(array_key_exists($label,$collabels)){
@@ -151,9 +156,13 @@ echo "\n</xmp>\n";
 	}
 
 /*
+RECHECK
+ 
 echo "\n<xmp>\n";
 print_r($collabels);
 echo "\n</xmp>\n";
+
+exit;
 */	
 	// HTML TABLE HEADER
 	
@@ -193,7 +202,7 @@ echo "\n</xmp>\n";
 									$bindvar = ":".$collabel['label'].'_'.$licrit;
 									$bindxpr = "regexp_like(".$collabel['name'].",".$bindvar.")";
 									array_push($al_qry,$bindxpr);
-									$a_binds[$bindvar] = '^'.implode('\S+?\s+?',$collabel['where']).'\S+$';
+									$a_binds[$bindvar] = '^'.implode('\S*?\s+?',$collabel['where']).'\S*$';
 									unset($bindvar);
 									unset($bindxpr);
 								}
@@ -207,7 +216,7 @@ echo "\n</xmp>\n";
 										if($i>0){
 											$bindvar = ":".$collabel['label'].'_'.$i.'_'.$licrit;
 											array_push($al_tmp,"regexp_like(".$collabel['name'].",".$bindvar.")");
-											$a_binds[$bindvar] = '^'.implode('\S+?\s+?',$rot_tmp).'\S+$';
+											$a_binds[$bindvar] = '^'.implode('\S*?\s+?',$rot_tmp).'\S+$';
 										}
 										$i++;
 									}
@@ -354,6 +363,9 @@ echo "\n</xmp>\n";
 
 	print "</tbody></table><br>\n";
 
+/*
+RECHECK
+
 	echo "<xmp>\n";
         echo "[sqlstrf:\n";
 	print_r($sqlstrf);
@@ -362,16 +374,24 @@ echo "\n</xmp>\n";
 	print_r($a_binds);
 	echo "\n]FIM\n";
 	echo "</xmp>\n";
-
+*/
 	unset($_SESSION['q']);
+
+	oci_close($conn);
 
 }
 
-oci_close($conn);
 ?>
 <span>busca de pessoas na base replicada da USP para SIBi - seu IP.: <?=get_client_ip()?></span>
+<br><br>
+* obs: <br>
+1. a busca se dará por padrão na coluna do nome da pessoa (<b>NOMPES</b>);<br>
+2. use <b>nome_da_coluna</b>:<b>termo</b> para busca nas demais colunas <?PHP if(count($collabels) > 0){ echo '('.implode(', ',array_keys($collabels)).')'; } ?>;<br>
+3. use <b>aspas</b> duplas ou simples cercando o <b>termo</b> caso desejada busca exata com espaços;<br>
+4. a quantidade de registros é <b>limitada em <?=MAX_ROWNUM?></b>, buscas muito genéricas não retornarão todos os registros possíveis.
+</body>
+</html>
 <?php
-
 
 function fsqltabletr($t_sqlryf,$t_conn,$abinds,$qcols){ 
 
@@ -413,17 +433,6 @@ function fsqltabletr($t_sqlryf,$t_conn,$abinds,$qcols){
 	return $ret;
 
 }
-
-?>
-<br><br>
-* obs: <br>
-1. a busca se dará por padrão na coluna do nome da pessoa (<b>NOMPES</b>);<br>
-2. use <b>nome_da_coluna</b>:<b>termo</b> para busca nas demais colunas (<?=implode(', ',array_keys($collabels))?>);<br>
-3. use <b>aspas</b> duplas ou simples cercando o <b>termo</b> caso desejada busca exata com espaços;<br>
-4. a quantidade de registros é <b>limitada em <?=MAX_ROWNUM?></b>, buscas muito genéricas não retornarão todos os registros possíveis.
-</body>
-</html>
-<?php
 
 function get_client_ip() {
      $ipaddress = '';
