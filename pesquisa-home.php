@@ -33,7 +33,7 @@ if(isset($_SESSION['dadosusp']['nusp'])){
 	<ul>
 	 <li><a href="pesquisa-uspvw-home.php">USP - vínculos</a></li>
 	 <li><a href="pesquisa-bdpi-home.php">BDPI</a></li>
-	 <!--li><a href="pesquisa-aleph-home.php">ALEPH</a></li-->
+	 <li><a href="pesquisa-aleph-home.php">ALEPH</a></li>
 	</ul>
 	<br/>
 	<a href="autentica-oauth1.php?logout=pesquisa-inicio.php">sair</a>

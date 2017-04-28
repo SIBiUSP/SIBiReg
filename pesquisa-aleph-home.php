@@ -34,8 +34,8 @@ if(isset($_SESSION['dadosusp']['nusp'])){
 	    <a href='http://www.dedalus.usp.br' target='_new'><i>DEDALUS - Universidade de São Paulo</i></a>
 	    </h6>
 	<ul>
-	 <li><a href="pesquisa-aleph_desdobramento-de-periodicos.php">ALEPH - Desdobramento de periódicos</a></li>
-	 <li><a href="pesquisa-aleph_desdobramento-de-periodicos-por-periodo.php">ALEPH - Desdobramento de periódicos por período</a></li>
+	 <li><a href="pesquisa-geral.php?pesq=desdobramento_periodicos">ALEPH - Desdobramento de periódicos</a></li>
+	 <li><a href="pesquisa-geral.php?pesq=desdobramento_periodicos_periodo">ALEPH - Desdobramento de periódicos por período</a></li>
 	</ul>
 	<br/>
 	<a href="autentica-oauth1.php?logout=pesquisa-inicio.php">sair</a>
