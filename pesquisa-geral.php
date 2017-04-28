@@ -100,10 +100,10 @@ if( array_key_exists('pesq',$_SESSION) && (strlen(trim($_SESSION['pesq'])) > 0) 
 <input type='hidden' name='page' value="<?=$_SESSION['page']?>" />
 
 linhas: <select name='pagesize' onselect="submit()">
-<option value="100" <?php echo(($_SESSION['pagesize'] == 100) ? 'selected' : '');  ?> >100</option>
-<option value="1000" <?php echo(($_SESSION['pagesize'] == 1000) ? 'selected' : '');  ?> >1000</option>
-<option value="10000" <?php echo(($_SESSION['pagesize'] == 10000) ? 'selected' : '');  ?> >10000</option>
-<option value="100000" <?php echo(($_SESSION['pagesize'] == 100000) ? 'selected' : '');  ?> >100000</option>
+<option value="100" <?php echo(($pagesize == 100) ? 'selected' : '');  ?> >100</option>
+<option value="1000" <?php echo(($pagesize == 1000) ? 'selected' : '');  ?> >1000</option>
+<option value="10000" <?php echo(($pagesize == 10000) ? 'selected' : '');  ?> >10000</option>
+<option value="100000" <?php echo(($pagesize == 100000) ? 'selected' : '');  ?> >100000</option>
 </select>
 
 <input type='submit' value='ok' />
