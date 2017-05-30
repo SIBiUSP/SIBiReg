@@ -44,8 +44,41 @@ if($thisplace === $runningplace){
 		session_destroy();
 		session_write_close();
 		setcookie(session_name(),'',0,'/');
-	
+
+?>
+<html>
+<script language=javascript>
+
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+    if (xhr.readyState == XMLHttpRequest.DONE) {
+
+<?php
+	if(strlen(filter_input(INPUT_GET,'backurl')) > 0){
+?>
+		window.location.href = '<?=filter_input(INPUT_GET,'backurl')?>' ;
+<?php
+	}
+	else {
+?>
+		window.location.href = '<?=filter_input(INPUT_GET,'logout')?>' ;
+<?php
+	}
+?>
+    }
+}
+
+xhr.open('GET', 'https://idpcafe.usp.br/idp/profile/Logout', true);
+xhr.withCredentials = true;
+xhr.send(null);
+
+</script>
+</html>
+<?php
+
+/*
 		if(strlen(filter_input(INPUT_GET,'backurl')) > 0){
+
 			header('Location: '.filter_input(INPUT_GET,'backurl'));
 			exit;
 		}
@@ -53,6 +86,7 @@ if($thisplace === $runningplace){
 			header('Location: '.filter_input(INPUT_GET,'logout'));
 			exit;
 		}
+*/
 	}
 	else { 
 		require_once('/var/simplesamlphp/lib/_autoload.php');
