@@ -63,7 +63,32 @@ if(array_key_exists('q',$_GET) && strlen($_GET['q'])>0){
 </style>
 
 </head>
-<body><!-- #FCB421 --><!-- #FCB421 -->
+<body>
+<?php
+
+if(!isset($_SESSION['oa1usp_dadosusp']->vinculo)){
+ echo "usuário não autenticado!";
+ echo "</body></html>";
+ exit;
+}
+
+$goahead = 0;
+foreach($_SESSION['oa1usp_dadosusp']->vinculo as $k => $v){
+	if(($v->tipoVinculo === 'SERVIDOR') && ($v->codigoUnidade === 69)){
+		$goahead = 1;
+	}
+}
+
+if($goahead === 0){
+ echo "usuário não habilitado para realizar esta consulta";
+ echo "</body></html>";
+ exit;
+}
+
+?>
+
+
+<!-- #FCB421 --><!-- #FCB421 -->
 <div style="background: url('bgusp.png') repeat-x fixed left top; padding: 5px;">
 <!--span style="font-size:20px;color:#3F3F3F;font-weight:bold">busc</span-->
 <span style="font-size:20px;color:#1694AB;font-weight:bold">USP</span>
