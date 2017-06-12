@@ -98,6 +98,7 @@ oci_close($conn);
 <!DOCTYPE html>
 <html>
     <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <title>Perfil SIBiUSP</title>
         <link rel="stylesheet" href="inc/uikit-2.27.1/css/uikit.min.css" />
         <link rel="stylesheet" href="inc/style.css" />
