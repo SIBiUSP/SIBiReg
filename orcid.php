@@ -119,7 +119,7 @@ $porcid =  $response['orcid'];
 
 $pvalor = $response['access_token'];
 
-$pcodpes = intval($_SESSION['dadosusp']['nusp']);
+$pcodpes = $_SESSION['dadosusp']['nusp'];
 
 /*
 echo "<pre>\n";
@@ -158,7 +158,7 @@ $sqlqry = "BEGIN :rpsres := perfil_sibi.agrega_identificador_orcid(:pcodpes,:pva
 $stid = oci_parse($conn, $sqlqry);
 if(!$stid){ exit; }
 
-$pcodpes = intval($_SESSION['dadosusp']['nusp']);
+$pcodpes = $_SESSION['dadosusp']['nusp'];
 $pvalor = $response['orcid'];
 $rpsres = '';
 oci_bind_by_name($stid,':pcodpes',$pcodpes);
