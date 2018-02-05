@@ -117,7 +117,7 @@ $porcid =  $response['orcid'];
 
 /*============================*/
 
-$pvalor = $response['access_token'];
+$ptokacc = $response['access_token'];
 
 $pcodpes = $_SESSION['dadosusp']['nusp'];
 
@@ -131,7 +131,7 @@ echo "B. olha a url post:[".http_build_query(array(
     'client_id' => OA2ORC_CLIENT_ID,
     'client_secret' => OA2ORC_CLIENT_SECRET
   ))."]\n";
-echo "B. olha o pvalor:[".$pvalor."]\n";
+echo "B. olha o ptokacc:[".$ptokacc."]\n";
 print_r($response);
 print_r($_SESSION);
 echo "\n</pre>";
@@ -140,29 +140,28 @@ exit;
 
 /*============================*/
 
-$sqlqry = "BEGIN perfil_sibi.isola_identificador(:pcodpes,'ORCIDTOKACC',:pvalor); END;";
+$sqlqry = "BEGIN perfil_sibi.isola_identificador(:pcodpes,'ORCIDTOKACC',:ptokacc); END;";
 
 $stid = oci_parse($conn, $sqlqry);
 if(!$stid){ exit; }
 
 oci_bind_by_name($stid,':pcodpes',$pcodpes);
-oci_bind_by_name($stid,':pvalor',$pvalor);
+oci_bind_by_name($stid,':ptokacc',$ptokacc);
 
 oci_execute($stid,OCI_NO_AUTO_COMMIT);
 
 /*============================*/
 /*============================*/
 
-$sqlqry = "BEGIN :rpsres := perfil_sibi.agrega_identificador_orcid(:pcodpes,:pvalor); END;";
+$sqlqry = "BEGIN :rpsres := perfil_sibi.agrega_identificador_orcid(:pcodpes,:porcid); END;";
 
 $stid = oci_parse($conn, $sqlqry);
 if(!$stid){ exit; }
 
 $pcodpes = $_SESSION['dadosusp']['nusp'];
-$pvalor = $response['orcid'];
 $rpsres = '';
 oci_bind_by_name($stid,':pcodpes',$pcodpes);
-oci_bind_by_name($stid,':pvalor',$pvalor);
+oci_bind_by_name($stid,':porcid',$porcid);
 oci_bind_by_name($stid,':rpsres',$rpsres,2000,SQLT_CHR);
 
 oci_execute($stid,OCI_NO_AUTO_COMMIT);
