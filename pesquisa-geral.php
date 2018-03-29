@@ -14,11 +14,6 @@ include('config.php');
 
 include('pesquisa-geral_pesquisas.php');
 
-ini_set("display_errors", 1);
-ini_set("track_errors", 1);
-ini_set("html_errors", 1);
-error_reporting(E_ALL);
-
 putenv("NLS_SORT=BINARY_AI");
 putenv("NLS_COMP=LINGUISTIC");
 putenv("NLS_LANG=BRAZILIAN PORTUGUESE_BRAZIL.UTF8");

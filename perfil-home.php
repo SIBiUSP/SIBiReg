@@ -9,11 +9,6 @@ header("Pragma: no-cache");
 include('autentica-saml.php');
 include('config.php');
 
-ini_set("display_errors", 1);
-ini_set("track_errors", 1);
-ini_set("html_errors", 1);
-error_reporting(E_ALL);
-
 putenv("NLS_SORT=BINARY_AI");
 putenv("NLS_COMP=LINGUISTIC");
 
