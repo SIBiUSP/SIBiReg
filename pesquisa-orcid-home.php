@@ -13,24 +13,25 @@ header("Pragma: no-cache");
 include('autentica-oauth1.php');
 include('config.php');
 
-define('MAX_ROWNUM',100);
+putenv("NLS_SORT=BINARY_AI");
+putenv("NLS_COMP=LINGUISTIC");
+putenv("NLS_LANG=BRAZILIAN PORTUGUESE_BRAZIL.UTF8");
+
+define('MAX_ROWNUM',100000);
 
 $page = ((isset($_GET['page']) && is_numeric($_GET['page'])) ? (int) $_GET['page'] : 0);
-$limit = 1000;
+$limit = MAX_ROWNUM;
 $offset = ($page * $limit);
 $goahead = 0;
 
 ?>
-<html>
+<!DOCTYPE html5>
+<html lang="pt_BR">
 <head><title>USP - SIBi</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <style>
-	* {
-		font-family: tahoma;
-		font-size: 12px;
-		color: black;
-		text-decoration: none;
-	}
+
 	table, th, td
 	{
 		border: 1px solid black;
@@ -45,6 +46,43 @@ $goahead = 0;
 	}
 	tbody tr:nth-child(odd) {
 		background-color: #13ffff;
+	}
+
+	* {
+		font-family: tahoma;
+		font-size: 12px;
+		color: black;
+		text-decoration: none;
+	}
+	/* DivTable.com */
+	.divTable{
+		display: table;
+		width: 100%;
+	}
+	.divTableRow {
+		display: table-row;
+	}
+	.divTableHeading {
+		background-color: #EEE;
+		display: table-header-group;
+	}
+	.divTableCell, .divTableHead {
+		border: 1px solid #999999;
+		display: table-cell;
+		padding: 3px 10px;
+	}
+	.divTableHeading {
+		background-color: #EEE;
+		display: table-header-group;
+		font-weight: bold;
+	}
+	.divTableFoot {
+		background-color: #EEE;
+		display: table-footer-group;
+		font-weight: bold;
+	}
+	.divTableBody {
+		display: table-row-group;
 	}
 </style>
 
@@ -79,19 +117,43 @@ $goahead = 0;
    <span style="font-size:18px;color:white;font-weight:bold">SIBi</span>
    </div>
    <br>
-   <form method="get" accept-charset="UTF-8">
-   <input type="text" name="q" size="100" value="<?=isset($_SESSION['q'])?htmlentities($_SESSION['q'], ENT_QUOTES):''?>"></input> &nbsp; <input type="submit" value="ok"></input>
-   </form>
 <?php
+
+/*
+   <form method="get" accept-charset="UTF-8">
+	<input type="text" name="q" size="100" value="<?=isset($_SESSION['q'])?htmlentities($_SESSION['q'], ENT_QUOTES):''?>"></input>
+ 	&nbsp; 
+ 	<input type="submit" value="ok"></input>&nbsp;<?php if($page > 0){ ?><a href="?page=<?=($page-1)?>">&lt;&lt;prev</a><?php } ?>&nbsp;<a href="?page=<?=($page+1)?>">next&gt;&gt;</a>
+   </form>
+*/
    
 //    if(array_key_exists('q',$_SESSION) && strlen($_SESSION['q'])>0){
-       $conn = oci_connect(DBUSR, DBPWD, DBURL);
+       $conn = oci_connect(DB_ORCID_USR, DB_ORCID_PWD, DB_ORCID_URL);
        if(!$conn){ exit; }
    
         $sqlqry=<<<EOT
-                SELECT MVW_RESUORCID.*
-                FROM MVW_RESUORCID
-                WHERE_EXPRESSION
+		SELECT
+		EXT_MVW_RESUORCID.EXTRN "Linha",
+		EXT_MVW_RESUORCID.NUSP,
+		EXT_MVW_RESUORCID.ORCID,
+		EXT_MVW_RESUORCID."Data da Coleta",
+		EXT_MVW_RESUORCID."Nome",
+		EXT_MVW_RESUORCID."Categoria",
+		EXT_MVW_RESUORCID."Unidade",
+		EXT_MVW_RESUORCID."Setor"
+		FROM (
+			SELECT
+			ROW_NUMBER() OVER ( ORDER BY MVW_RESUORCID."Nome" ) AS EXTRN,
+			MVW_RESUORCID.NUSP,
+			MVW_RESUORCID.ORCID,
+			TO_CHAR(MVW_RESUORCID."Data da Coleta",'DD/MM/YYYY HH24:MI:SS') "Data da Coleta",
+			MVW_RESUORCID."Nome",
+			MVW_RESUORCID."Categoria",
+			MVW_RESUORCID."Unidade",
+			MVW_RESUORCID."Setor"		
+			FROM MVW_RESUORCID
+		) EXT_MVW_RESUORCID
+		WHERE_EXPRESSION
 EOT
         ;
 //             ORDER BY "Nome"
@@ -100,6 +162,8 @@ EOT
     $sqlqryheads = $sqlqry;
     $sqlqryheads = str_replace("WHERE_EXPRESSION"," WHERE rownum < 1",$sqlqryheads);
     // $sqlqryheads = str_replace("ORDERINGCOWS","",$sqlqryheads);
+
+	// echo $sqlqryheads; exit;
 
     $stid = oci_parse($conn, $sqlqryheads);
     if(!$stid){ exit; }
@@ -115,18 +179,24 @@ EOT
 
     oci_free_statement($stid);
 	
-	print "<table border='0'>\n";
-	print "<thead><tr>";
-	print "<td>Linha</td>\n";
+	// print "<div class='divTable'>\n";
+	print "<table>\n";
+	// print "<div class='divTableHeading'><div class='divTableRow'>";
+	print "<thead>\n";
+	// print "<td>Linha</td>\n";
 	foreach($collabels as $collabel){
+		// print "<div class='divTableHead'>".$collabel['label']."</div>";
 		print "<th>".$collabel['label']."</th>";
 	}
-	print "</tr></thead>";
+	// print "</div></div>";
+	print "</thead>";
+
+	// print "<div class='divTableBody'>";
 	print "<tbody>";
 
 	//BUILD SQL EXPRESSION	
     $sqlqrybody = $sqlqry;
-    $sqlqrybody = str_replace("WHERE_EXPRESSION","where rownum < 50",$sqlqrybody);
+    $sqlqrybody = str_replace("WHERE_EXPRESSION","WHERE EXTRN BETWEEN ".($page*$limit + 1)." AND ".(($page + 1)*$limit),$sqlqrybody);
 
 	$totlins = 0;
 	
@@ -134,7 +204,9 @@ EOT
         flush();
 	}
 
+	// print "</div></div><br>\n";
 	print "</tbody></table><br>\n";
+	print "</body>\n</html>\n";
 
 /*
 RECHECK
@@ -174,11 +246,13 @@ function fsqltabletr(){
 	while ($row = oci_fetch_array($stid, OCI_ASSOC+OCI_RETURN_NULLS)) {
 		$totlins++;
 		if($totlins <= MAX_ROWNUM){
+			// print "<div class='divTableRow'>\n";
 			print "<tr>\n";
-			print "<td>".$totlins."</td>\n";
+			// print "<td>".$totlins."</td>\n";
 			$i=0;
 			foreach ($row as $icol) {
 				$i++;
+				// print "    <div class='divTableCell'>" . ($icol !== null ? htmlentities($icol, ENT_QUOTES) : "&nbsp;") . "</div>\n";
 				print "    <td>" . ($icol !== null ? htmlentities($icol, ENT_QUOTES) : "&nbsp;") . "</td>\n";
 				$ret = true;
 				if($i >= $ncols) break;
