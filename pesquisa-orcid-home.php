@@ -35,6 +35,7 @@ $totlins = 0;
 $sqlqrybody = "";
 $conn = null;
 $ncols = 0;
+$agoratime = time();
 
 $orcidlistmc = new Memcached('orcidlist');
 
@@ -45,11 +46,11 @@ if (!count($orcidlistmc->getServerList())) {
 }
 
 if(empty($orcidlistmc->get('last'.$viewlayout.'update'))){
-    $orcidlistmc->set('last'.$viewlayout.'update', time() );
+    $orcidlistmc->set('last'.$viewlayout.'update', $agoratime );
 }
 
-if((time() - $orcidlistmc->get('last'.$viewlayout.'update')) > 5){
-    $orcidlistmc->set('last'.$viewlayout.'update', time() );
+if(($agoratime - $orcidlistmc->get('last'.$viewlayout.'update')) > 5){
+    $orcidlistmc->set('last'.$viewlayout.'update', $agoratime );
     exibe_armazena_conteudo();
 }
 elseif(empty($orcidlistmc->get('last'.$viewlayout.'content'))){
