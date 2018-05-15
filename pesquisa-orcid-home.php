@@ -4,11 +4,18 @@
 * alterado em 27/mar/2017
 */
 
+$viewlayout = (array_key_exists('viewlayout',$_GET)?$_GET['viewlayout']:'html');
+
 header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
+
+if($viewlayout == 'xls'){
+	header("Content-Type:   application/vnd.ms-excel; charset=utf-8");
+	header("Content-Disposition: attachment; filename=orcid.xls");
+}
 
 include('autentica-oauth1.php');
 include('config.php');
@@ -23,6 +30,40 @@ $page = ((isset($_GET['page']) && is_numeric($_GET['page'])) ? (int) $_GET['page
 $limit = MAX_ROWNUM;
 $offset = ($page * $limit);
 $goahead = 0;
+$orderby = (array_key_exists('orderby',$_GET)?$_GET['orderby']:'');
+$totlins = 0;
+$sqlqrybody = "";
+$conn = null;
+$ncols = 0;
+
+$orcidlistmc = new Memcached('orcidlist');
+
+if (!count($orcidlistmc->getServerList())) {
+    $orcidlistmc->addServers(array(
+        array(MEMCACHESRVR,MEMCACHEPORT)
+    ));
+}
+
+if(empty($orcidlistmc->get('last'.$viewlayout.'update'))){
+    $orcidlistmc->set('last'.$viewlayout.'update', time() );
+}
+
+if((time() - $orcidlistmc->get('last'.$viewlayout.'update')) > 5){
+    $orcidlistmc->set('last'.$viewlayout.'update', time() );
+    exibe_armazena_conteudo();
+}
+elseif(empty($orcidlistmc->get('last'.$viewlayout.'content'))){
+    exibe_armazena_conteudo();
+}
+else{
+    echo $orcidlistmc->get('last'.$viewlayout.'content');
+}
+
+function exibe_armazena_conteudo(){
+    global $orcidlistmc, $page, $limit, $offset, $goahead, $orderby, $totlins, $sqlqrybody, $conn, $ncols, $viewlayout;
+    ob_start();
+
+	if($viewlayout == 'html'){
 
 ?>
 <!DOCTYPE html5>
@@ -39,20 +80,18 @@ $goahead = 0;
 		border-collapse:collapse;
 	}
 	thead tr {
-		background-color: yellow;
+		background-color: #aaaaaa;
 	}
 	tbody tr:nth-child(even) {
-		background-color: #aacccc;
+		background-color: #cccccc;
 	}
 	tbody tr:nth-child(odd) {
-		background-color: #13ffff;
+		background-color: #ffffff;
 	}
 
 	* {
 		font-family: tahoma;
 		font-size: 12px;
-		color: black;
-		text-decoration: none;
 	}
 	/* DivTable.com */
 	.divTable{
@@ -89,25 +128,33 @@ $goahead = 0;
 </head>
 <body>
 <?php
+}
+
 
     if(!isset($_SESSION['oa1usp_dadosusp']->vinculo)){
-        echo "usuário não autenticado!";
-        echo "</body></html>";
+		echo "usuário não autenticado!";
+		if($viewlayout == 'html'){
+			echo "</body></html>";
+		}
         exit;
     }
    
    foreach($_SESSION['oa1usp_dadosusp']->vinculo as $k => $v){
        if(($v->tipoVinculo === 'SERVIDOR') && ($v->codigoUnidade === 69)){
-           $goahead = 1;
+			$goahead = 1;
        }
    }
    
    if($goahead === 0){
-    echo "usuário não habilitado para realizar esta consulta";
-    echo "</body></html>";
+	echo "usuário não habilitado para realizar esta consulta";
+	if($viewlayout == 'html'){
+		echo "</body></html>";
+	}
     exit;
    }
-   
+
+
+if($viewlayout == 'html'){
 ?>
    <!-- #FCB421 --><!-- #FCB421 -->
    <div style="background: url('bgusp.png') repeat-x fixed left top; padding: 5px;">
@@ -117,6 +164,10 @@ $goahead = 0;
    <span style="font-size:18px;color:white;font-weight:bold">SIBi</span>
    </div>
    <br>
+
+<a href='<?=$_SERVER['SCRIPT_NAME'].(array_key_exists('PATH_INFO',$_SERVER)?$_SERVER['PATH_INFO']:'').(array_key_exists('QUERY_STRING',$_SERVER)?'?'.str_replace($_SERVER['QUERY_STRING'],'viewlayout='.$viewlayout,'viewlayout=xls'):'')?>'>exportar para excel</a>
+<br><br>
+
 <?php
 
 /*
@@ -126,10 +177,15 @@ $goahead = 0;
  	<input type="submit" value="ok"></input>&nbsp;<?php if($page > 0){ ?><a href="?page=<?=($page-1)?>">&lt;&lt;prev</a><?php } ?>&nbsp;<a href="?page=<?=($page+1)?>">next&gt;&gt;</a>
    </form>
 */
-   
+}
+
 //    if(array_key_exists('q',$_SESSION) && strlen($_SESSION['q'])>0){
        $conn = oci_connect(DB_ORCID_USR, DB_ORCID_PWD, DB_ORCID_URL);
-       if(!$conn){ exit; }
+	   if(!$conn){ exit; }
+	   
+	   $stid = oci_parse($conn,"ALTER SESSION SET NLS_DATE_FORMAT = 'DD-MM-YYYY'");
+	   oci_execute($stid);
+	   oci_commit($conn);
    
         $sqlqry=<<<EOT
 		SELECT
@@ -146,7 +202,7 @@ $goahead = 0;
 			ROW_NUMBER() OVER ( ORDER BY MVW_RESUORCID."Nome" ) AS EXTRN,
 			MVW_RESUORCID.NUSP,
 			MVW_RESUORCID.ORCID,
-			TO_CHAR(MVW_RESUORCID."Data da Coleta",'DD/MM/YYYY HH24:MI:SS') "Data da Coleta",
+			to_char(MVW_RESUORCID."Data da Coleta",'YYYY-MM-DD') "Data da Coleta",
 			MVW_RESUORCID."Nome",
 			MVW_RESUORCID."Categoria",
 			MVW_RESUORCID."Unidade",
@@ -178,25 +234,52 @@ EOT
     }
 
     oci_free_statement($stid);
-	
-	// print "<div class='divTable'>\n";
-	print "<table>\n";
-	// print "<div class='divTableHeading'><div class='divTableRow'>";
-	print "<thead>\n";
-	// print "<td>Linha</td>\n";
-	foreach($collabels as $collabel){
-		// print "<div class='divTableHead'>".$collabel['label']."</div>";
-		print "<th>".$collabel['label']."</th>";
-	}
-	// print "</div></div>";
-	print "</thead>";
 
+	if($viewlayout == 'html'){
+		// print "<div class='divTable'>\n";
+		print "<table>\n";
+		// print "<div class='divTableHeading'><div class='divTableRow'>";
+		print "<thead>\n";
+		// print "<td>Linha</td>\n";
+
+		foreach($collabels as $collabel){
+			// [inicio] implementacao de order by em andamento
+			// print "<th><a href=\"?orderby=".urlencode('"'.$collabel['label'].'"')."\">".$collabel['label']."</a></th>";
+			// [fim]
+			print "<th>".$collabel['label']."</th>";
+		}
+
+		// print "</div></div>";
+		print "</thead>";
 	// print "<div class='divTableBody'>";
-	print "<tbody>";
+		print "<tbody>";
+	}
+	elseif($viewlayout == 'xls'){
+		print "<table>\n";
+		print "<thead>\n";
+		foreach($collabels as $collabel){
+			print "<th>".$collabel['label']."</th>";
+		}
+		print "</thead>";
+		print "<tbody>";
+	}
 
 	//BUILD SQL EXPRESSION	
     $sqlqrybody = $sqlqry;
-    $sqlqrybody = str_replace("WHERE_EXPRESSION","WHERE EXTRN BETWEEN ".($page*$limit + 1)." AND ".(($page + 1)*$limit),$sqlqrybody);
+	// $sqlqrybody = str_replace("WHERE_EXPRESSION","WHERE EXTRN BETWEEN ".($page*$limit + 1)." AND ".(($page + 1)*$limit),$sqlqrybody);
+	if(strlen($orderby) > 0 ){
+		$sqlqrybody = str_replace("WHERE_EXPRESSION","WHERE ROWNUM < 100 ORDER BY ".$orderby,$sqlqrybody);
+/*
+		echo "<xmp>\n";
+        echo $sqlqrybody;
+		echo "\n";
+		echo "</xmp>\n";
+*/
+
+	}
+	else {
+		$sqlqrybody = str_replace("WHERE_EXPRESSION","",$sqlqrybody);
+	}
 
 	$totlins = 0;
 	
@@ -204,9 +287,14 @@ EOT
         flush();
 	}
 
-	// print "</div></div><br>\n";
-	print "</tbody></table><br>\n";
-	print "</body>\n</html>\n";
+	if($viewlayout == 'html'){
+		// print "</div></div><br>\n";
+		print "</tbody></table><br>\n";
+		print "</body>\n</html>\n";
+	}
+	elseif($viewlayout == 'xls'){
+		print "</tbody></table>\n";
+	}
 
 /*
 RECHECK
@@ -224,9 +312,15 @@ RECHECK
 
 	oci_close($conn);
 
+    $orcidlistmc->set('last'.$viewlayout.'content',ob_get_contents());
+    
+    ob_end_flush();
+
+}
+
 function fsqltabletr(){ 
 
-	global $totlins, $sqlqrybody, $conn, $ncols;
+	global $totlins, $sqlqrybody, $conn, $ncols, $viewlayout;
 
 	if($totlins > MAX_ROWNUM) return true;
 
@@ -252,7 +346,6 @@ function fsqltabletr(){
 			$i=0;
 			foreach ($row as $icol) {
 				$i++;
-				// print "    <div class='divTableCell'>" . ($icol !== null ? htmlentities($icol, ENT_QUOTES) : "&nbsp;") . "</div>\n";
 				print "    <td>" . ($icol !== null ? htmlentities($icol, ENT_QUOTES) : "&nbsp;") . "</td>\n";
 				$ret = true;
 				if($i >= $ncols) break;
@@ -266,5 +359,4 @@ function fsqltabletr(){
 	return $ret;
 
 }
-
 
