@@ -45,7 +45,7 @@ if (!count($orcidlistmc->getServerList())) {
     ));
 }
 
-if(empty($orcidlistmc->get('last'.$viewlayout.'update'))){
+if(null !== $orcidlistmc->get('last'.$viewlayout.'update')){
     $orcidlistmc->set('last'.$viewlayout.'update', $agoratime );
 }
 
@@ -53,7 +53,7 @@ if(($agoratime - $orcidlistmc->get('last'.$viewlayout.'update')) > 5){
     $orcidlistmc->set('last'.$viewlayout.'update', $agoratime );
     exibe_armazena_conteudo();
 }
-elseif(empty($orcidlistmc->get('last'.$viewlayout.'content'))){
+elseif(null !== $orcidlistmc->get('last'.$viewlayout.'content')){
     exibe_armazena_conteudo();
 }
 else{
