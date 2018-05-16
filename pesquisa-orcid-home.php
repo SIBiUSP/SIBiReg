@@ -141,9 +141,9 @@ function exibe_armazena_conteudo(){
     }
    
    foreach($_SESSION['oa1usp_dadosusp']->vinculo as $k => $v){
-       if(($v->tipoVinculo === 'SERVIDOR') && ($v->codigoUnidade === 69)){
+       // if(($v->tipoVinculo === 'SERVIDOR') && ($v->codigoUnidade === 69)){
 			$goahead = 1;
-       }
+       // }
    }
    
    if($goahead === 0){
