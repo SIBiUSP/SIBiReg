@@ -181,7 +181,7 @@ if($viewlayout == 'html'){
 }
 
 //    if(array_key_exists('q',$_SESSION) && strlen($_SESSION['q'])>0){
-       $conn = oci_connect(DB_ORCID_USR, DB_ORCID_PWD, DB_ORCID_URL);
+       $conn = oci_connect(DBUSR, DBPWD, DBURL);
 	   if(!$conn){ exit; }
 	   
 	   $stid = oci_parse($conn,"ALTER SESSION SET NLS_DATE_FORMAT = 'DD-MM-YYYY'");

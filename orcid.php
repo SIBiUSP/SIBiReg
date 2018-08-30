@@ -62,7 +62,7 @@ if(strlen(filter_input(INPUT_GET,'code')) === 0) {
   $url = OA2ORC_AUTHORIZATION_URL . '?' . http_build_query(array(
       'response_type' => 'code',
       'client_id' => OA2ORC_CLIENT_ID,
-      'redirect_uri' => OA2ORC_REDIRECT_URI.(empty($kem)?'':'?kem='.$kem),
+      'redirect_uri' => 'https://www.sibi.usp.br/sibireg/orcid.php'.(empty($kem)?'':'?kem='.$kem),
       'scope' => '/read-limited /activities/update /person/update',
       'state' => $_SESSION['oauth_state'],
       'show_login' => 'true',
