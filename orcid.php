@@ -38,7 +38,7 @@ else {
 }
 
 // if($currentBaseURL !== OA2ORC_REDIRECT_URI){
-if(!empty($_SESSION['real_redirect']) && ($_SESSION['real_redirect'] !== OA2ORC_REDIRECT_URI)){
+if(!empty($_SESSION['real_redirect']) && ($_SESSION['real_redirect'] !== 'https://www.sibi.usp.br/sibireg/orcid.php')){
 	$kem = session_id();
 	$scheme = (array_key_exists('HTTPS',$_SERVER)?'https':'http');
   $_SESSION['OA2ORCBACKURL'] = $orcbackurl;
