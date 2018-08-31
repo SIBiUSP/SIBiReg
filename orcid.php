@@ -97,7 +97,7 @@ if ( filter_input(INPUT_GET,'state') !== $_SESSION['oauth_state'] ) {
  print_r($_SESSION);
  echo "\n-->";
  
- exit('Invalid state');
+ exit('Estado inválido');
 }
 
 $curl = curl_init();
