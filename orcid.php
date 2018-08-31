@@ -74,7 +74,6 @@ if(strlen(filter_input(INPUT_GET,'code')) === 0) {
   setcookie('oauth_state', $state, time() + 3600, null, null, false, true);
   $_SESSION['oauth_state'] = bin2hex(openssl_random_pseudo_bytes(16));
   $_SESSION['real_redirect'] = OA2ORC_REDIRECT_URI;
-  $_SESSION['bostelejo'] = 'bostex';
   $url = OA2ORC_AUTHORIZATION_URL . '?' . http_build_query(array(
       'response_type' => 'code',
       'client_id' => OA2ORC_CLIENT_ID,
@@ -102,7 +101,8 @@ if(strlen(filter_input(INPUT_GET,'code')) === 0) {
 }
 
 if ( filter_input(INPUT_GET,'state') !== $_SESSION['oauth_state'] ) {
- 
+
+/*
  echo "<!--\n";
  echo "state: [".filter_input(INPUT_GET,'state')."]\n";
  echo "oauth_state: [".$_SESSION['oauth_state']."]\n";
@@ -110,7 +110,7 @@ if ( filter_input(INPUT_GET,'state') !== $_SESSION['oauth_state'] ) {
  echo "sessid: [".session_id()."]\n";
  print_r($_SESSION);
  echo "\n-->";
- 
+*/ 
  exit('invalid state');
 }
 
@@ -210,9 +210,9 @@ if(array_key_exists('query',$agourl)){
   $agoparms = array();
 }
 
-print_r($_SESSION);
+// print_r($_SESSION);
 
-echo('Location: '.(array_key_exists('scheme',$agourl)?$agourl['scheme'].':':'').'//'.$agourl['host'].$agourl['path'].'?'.http_build_query(array_merge($agoparms,array(
+header('Location: '.(array_key_exists('scheme',$agourl)?$agourl['scheme'].':':'').'//'.$agourl['host'].$agourl['path'].'?'.http_build_query(array_merge($agoparms,array(
 		'orcid' => $porcid ,
 		'nome' => $_SESSION['dadosusp']['nome']
       ))));
