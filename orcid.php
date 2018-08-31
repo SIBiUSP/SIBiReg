@@ -37,14 +37,15 @@ else {
   $orcbackurl = filter_input(INPUT_GET,'obkurl');
 }
 
-if($currentBaseURL !== OA2ORC_REDIRECT_URI){
-
+// if($currentBaseURL !== OA2ORC_REDIRECT_URI){
+if(!empty($_SESSION['real_redirect']) && ($_SESSION['real_redirect'] !== OA2ORC_REDIRECT_URI)){
 	$kem = session_id();
 	$scheme = (array_key_exists('HTTPS',$_SERVER)?'https':'http');
-	$_SESSION['OA2ORCBACKURL'] = $orcbackurl;
-
+  $_SESSION['OA2ORCBACKURL'] = $orcbackurl;
+  
 	session_write_close();
-	header(empty($_SERVER['QUERY_STRING']) ? 'Location: '.OA2ORC_REDIRECT_URI.'?kem='.$kem : 'Location: '.OA2ORC_REDIRECT_URI.'?'.$_SERVER['QUERY_STRING'].'&kem='.$kem);
+  // header(empty($_SERVER['QUERY_STRING']) ? 'Location: '.OA2ORC_REDIRECT_URI.'?kem='.$kem : 'Location: '.OA2ORC_REDIRECT_URI.'?'.$_SERVER['QUERY_STRING'].'&kem='.$kem);
+  header(empty($_SERVER['QUERY_STRING']) ? 'Location: '.$_SESSION['real_redirect'].'?kem='.$kem : 'Location: '.$_SESSION['real_redirect'].'?'.$_SERVER['QUERY_STRING'].'&kem='.$kem);
 	exit;
 }
 
@@ -59,6 +60,7 @@ if(strlen(filter_input(INPUT_GET,'code')) === 0) {
   $state = bin2hex(openssl_random_pseudo_bytes(16));
   setcookie('oauth_state', $state, time() + 3600, null, null, false, true);
   $_SESSION['oauth_state'] = bin2hex(openssl_random_pseudo_bytes(16));
+  $_SESSION['real_redirect'] = OA2ORC_REDIRECT_URI;
   $url = OA2ORC_AUTHORIZATION_URL . '?' . http_build_query(array(
       'response_type' => 'code',
       'client_id' => OA2ORC_CLIENT_ID,
