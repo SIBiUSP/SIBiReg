@@ -39,7 +39,7 @@ else {
 }
 
 // if($currentBaseURL !== OA2ORC_REDIRECT_URI){
-if(!empty($_SESSION['real_redirect']) && ($_SESSION['real_redirect'] !== 'https://www.sibi.usp.br/sibireg/orcid.php')){
+if(array_key_exists('real_redirect', $_SESSION) && (strlen($_SESSION['real_redirect']) > 0)  && ($_SESSION['real_redirect'] !== 'https://www.sibi.usp.br/sibireg/orcid.php')){
 	
 	$scheme = (array_key_exists('HTTPS',$_SERVER)?'https':'http');
   $_SESSION['OA2ORCBACKURL'] = $orcbackurl;
@@ -47,8 +47,11 @@ if(!empty($_SESSION['real_redirect']) && ($_SESSION['real_redirect'] !== 'https:
 	session_write_close();
   // header(empty($_SERVER['QUERY_STRING']) ? 'Location: '.OA2ORC_REDIRECT_URI.'?kem='.$kem : 'Location: '.OA2ORC_REDIRECT_URI.'?'.$_SERVER['QUERY_STRING'].'&kem='.$kem);
   // echo "<!-- ";
+  $tmprealredirect = "".$_SESSION['real_redirect'];
+  $_SESSION['real_redirect'] = '';
   unset($_SESSION['real_redirect']);
-  header(empty($_SERVER['QUERY_STRING']) ? 'Location: '.$_SESSION['real_redirect'].'?kem='.$kem : 'Location: '.$_SESSION['real_redirect'].'?'.$_SERVER['QUERY_STRING']);
+
+  header(empty($_SERVER['QUERY_STRING']) ? 'Location: '.$tmprealredirect.'?kem='.$kem : 'Location: '.$tmprealredirect.'?'.$_SERVER['QUERY_STRING']);
   // echo "\n-->";
 	exit;
 }
