@@ -88,14 +88,15 @@ if(strlen(filter_input(INPUT_GET,'code')) === 0) {
 }
 
 if ( filter_input(INPUT_GET,'state') !== $_SESSION['oauth_state'] ) {
- /*
- echo "<pre>\n";
+ 
+ echo "<!--\n";
  echo "state: [".filter_input(INPUT_GET,'state')."]\n";
  echo "oauth_state: [".$_SESSION['oauth_state']."]\n";
  echo "kem: [".$kem."]\n";
  echo "sessid: [".session_id()."]\n";
- echo "\n</pre>";
- */
+ print_r($_SESSION);
+ echo "\n-->";
+ 
  exit('Invalid state');
 }
 
