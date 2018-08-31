@@ -28,6 +28,7 @@ else {
 }
 */
 
+$kem = session_id();
 $currentBaseURL = (array_key_exists('HTTPS',$_SERVER)?'https':'http').'://'.filter_input(INPUT_SERVER,'HTTP_HOST').filter_input(INPUT_SERVER,'SCRIPT_NAME');
 
 if(((string)filter_input(INPUT_GET,'obkurl')) === ''){
@@ -39,7 +40,7 @@ else {
 
 // if($currentBaseURL !== OA2ORC_REDIRECT_URI){
 if(!empty($_SESSION['real_redirect']) && ($_SESSION['real_redirect'] !== 'https://www.sibi.usp.br/sibireg/orcid.php')){
-	$kem = session_id();
+	
 	$scheme = (array_key_exists('HTTPS',$_SERVER)?'https':'http');
   $_SESSION['OA2ORCBACKURL'] = $orcbackurl;
   
@@ -97,7 +98,7 @@ if ( filter_input(INPUT_GET,'state') !== $_SESSION['oauth_state'] ) {
  print_r($_SESSION);
  echo "\n-->";
  
- exit('Estado inválido');
+ exit('invalid state');
 }
 
 $curl = curl_init();
