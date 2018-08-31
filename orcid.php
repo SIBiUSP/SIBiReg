@@ -28,6 +28,13 @@ else {
 }
 */
 
+if( filter_input(INPUT_SERVER,'REMOTE_ADDR') !== '200.144.210.114' ){
+
+  echo 'Desculpe o transtorno, site em manutenção.';
+  exit;
+
+}
+
 $kem = session_id();
 $currentBaseURL = (array_key_exists('HTTPS',$_SERVER)?'https':'http').'://'.filter_input(INPUT_SERVER,'HTTP_HOST').filter_input(INPUT_SERVER,'SCRIPT_NAME');
 
