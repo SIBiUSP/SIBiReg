@@ -28,12 +28,14 @@ else {
 }
 */
 
+/*
 if( filter_input(INPUT_SERVER,'REMOTE_ADDR') !== '200.144.210.114' ){
 
   echo 'Desculpe o transtorno, site em manutenção.';
   exit;
 
 }
+*/
 
 $kem = session_id();
 $currentBaseURL = (array_key_exists('HTTPS',$_SERVER)?'https':'http').'://'.filter_input(INPUT_SERVER,'HTTP_HOST').filter_input(INPUT_SERVER,'SCRIPT_NAME');
@@ -54,13 +56,9 @@ if(array_key_exists('real_redirect', $_SESSION) && (strlen($_SESSION['real_redir
   $tmprealredirect = "".$_SESSION['real_redirect'];
   $_SESSION['real_redirect'] = '';
   unset($_SESSION['real_redirect']);
-  
-	session_write_close();
-  // header(empty($_SERVER['QUERY_STRING']) ? 'Location: '.OA2ORC_REDIRECT_URI.'?kem='.$kem : 'Location: '.OA2ORC_REDIRECT_URI.'?'.$_SERVER['QUERY_STRING'].'&kem='.$kem);
-  // echo "<!-- ";
 
+	session_write_close();
   header(empty($_SERVER['QUERY_STRING']) ? 'Location: '.$tmprealredirect.'?kem='.$kem : 'Location: '.$tmprealredirect.'?'.$_SERVER['QUERY_STRING']);
-  // echo "\n-->";
 	exit;
 }
 
