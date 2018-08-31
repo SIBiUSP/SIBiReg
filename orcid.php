@@ -46,9 +46,10 @@ if(!empty($_SESSION['real_redirect']) && ($_SESSION['real_redirect'] !== 'https:
   
 	session_write_close();
   // header(empty($_SERVER['QUERY_STRING']) ? 'Location: '.OA2ORC_REDIRECT_URI.'?kem='.$kem : 'Location: '.OA2ORC_REDIRECT_URI.'?'.$_SERVER['QUERY_STRING'].'&kem='.$kem);
-  echo "<!-- ";
-  print_r(empty($_SERVER['QUERY_STRING']) ? 'Location: '.$_SESSION['real_redirect'].'?kem='.$kem : 'Location: '.$_SESSION['real_redirect'].'?'.$_SERVER['QUERY_STRING'].'&kem='.$kem);
-  echo "\n-->";
+  // echo "<!-- ";
+  $_SESSION['real_redirect'] = '';
+  header(empty($_SERVER['QUERY_STRING']) ? 'Location: '.$_SESSION['real_redirect'].'?kem='.$kem : 'Location: '.$_SESSION['real_redirect'].'?'.$_SERVER['QUERY_STRING']);
+  // echo "\n-->";
 	exit;
 }
 
