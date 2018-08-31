@@ -40,18 +40,22 @@ if( filter_input(INPUT_SERVER,'REMOTE_ADDR') !== '200.144.210.114' ){
 $kem = session_id();
 $currentBaseURL = (array_key_exists('HTTPS',$_SERVER)?'https':'http').'://'.filter_input(INPUT_SERVER,'HTTP_HOST').filter_input(INPUT_SERVER,'SCRIPT_NAME');
 
-if(((string)filter_input(INPUT_GET,'obkurl')) === ''){
-  $orcbackurl = OA2ORCBACKURL;
-}
-else {
+if(strlen((string)filter_input(INPUT_GET,'obkurl')) >0){
   $orcbackurl = filter_input(INPUT_GET,'obkurl');
 }
+elseif( array_key_exists('OA2ORCBACKURL', $_SESSION) && (strlen($_SESSION['OA2ORCBACKURL']) > 0) ) {
+  $orcbackurl = $_SESSION['OA2ORCBACKURL'];
+}
+else {
+  $orcbackurl = OA2ORCBACKURL;
+}
+
+$_SESSION['OA2ORCBACKURL'] = $orcbackurl;
 
 // if($currentBaseURL !== OA2ORC_REDIRECT_URI){
 if(array_key_exists('real_redirect', $_SESSION) && (strlen($_SESSION['real_redirect']) > 0)  && ($_SESSION['real_redirect'] !== 'https://www.sibi.usp.br/sibireg/orcid.php')){
 	
 	$scheme = (array_key_exists('HTTPS',$_SERVER)?'https':'http');
-  $_SESSION['OA2ORCBACKURL'] = $orcbackurl;
 
   $tmprealredirect = "".$_SESSION['real_redirect'];
   $_SESSION['real_redirect'] = '';
