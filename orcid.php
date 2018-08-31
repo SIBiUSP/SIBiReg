@@ -38,21 +38,7 @@ if( filter_input(INPUT_SERVER,'REMOTE_ADDR') !== '200.144.210.114' ){
 */
 
 $kem = session_id();
-$currentBaseURL = (array_key_exists('HTTPS',$_SERVER)?'https':'http').'://'.filter_input(INPUT_SERVER,'HTTP_HOST').filter_input(INPUT_SERVER,'SCRIPT_NAME');
 
-if(strlen((string)filter_input(INPUT_GET,'obkurl')) >0){
-  $orcbackurl = filter_input(INPUT_GET,'obkurl');
-}
-elseif( array_key_exists('OA2ORCBACKURL', $_SESSION) && (strlen($_SESSION['OA2ORCBACKURL']) > 0) ) {
-  $orcbackurl = $_SESSION['OA2ORCBACKURL'];
-}
-else {
-  $orcbackurl = OA2ORCBACKURL;
-}
-
-$_SESSION['OA2ORCBACKURL'] = $orcbackurl;
-
-// if($currentBaseURL !== OA2ORC_REDIRECT_URI){
 if(array_key_exists('real_redirect', $_SESSION) && (strlen($_SESSION['real_redirect']) > 0)  && ($_SESSION['real_redirect'] !== 'https://www.sibi.usp.br/sibireg/orcid.php')){
 	
 	$scheme = (array_key_exists('HTTPS',$_SERVER)?'https':'http');
@@ -66,10 +52,20 @@ if(array_key_exists('real_redirect', $_SESSION) && (strlen($_SESSION['real_redir
 	exit;
 }
 
+if(strlen(trim((string)filter_input(INPUT_GET,'obkurl'))) >0){
+  $orcbackurl = filter_input(INPUT_GET,'obkurl');
+  $_SESSION['OA2ORCBACKURL'] = $orcbackurl;
+}
+elseif( array_key_exists('OA2ORCBACKURL', $_SESSION) && (strlen($_SESSION['OA2ORCBACKURL']) > 0) ) {
+  $orcbackurl = $_SESSION['OA2ORCBACKURL'];
+}
+else {
+  $orcbackurl = OA2ORCBACKURL;
+  $_SESSION['OA2ORCBACKURL'] = $orcbackurl;
+}
+
 putenv("NLS_SORT=BINARY_AI");
 putenv("NLS_COMP=LINGUISTIC");
-
-$conn = oci_connect(DBUSR, DBPWD, DBURL);
 
 // credito: https://gist.github.com/hubgit/46a868b912ccd65e4a6b
 
@@ -78,6 +74,7 @@ if(strlen(filter_input(INPUT_GET,'code')) === 0) {
   setcookie('oauth_state', $state, time() + 3600, null, null, false, true);
   $_SESSION['oauth_state'] = bin2hex(openssl_random_pseudo_bytes(16));
   $_SESSION['real_redirect'] = OA2ORC_REDIRECT_URI;
+  $_SESSION['bostelejo'] = 'bostex';
   $url = OA2ORC_AUTHORIZATION_URL . '?' . http_build_query(array(
       'response_type' => 'code',
       'client_id' => OA2ORC_CLIENT_ID,
@@ -162,6 +159,8 @@ exit;
 
 $sqlqry = "BEGIN perfil_sibi.isola_identificador(:pcodpes,'ORCIDTOKACC',:ptokacc); END;";
 
+$conn = oci_connect(DBUSR, DBPWD, DBURL);
+
 $stid = oci_parse($conn, $sqlqry);
 if(!$stid){ exit; }
 
@@ -193,6 +192,7 @@ oci_commit($conn);
 oci_free_statement($stid);
 oci_close($conn);
 
+/*
 if(isset($_SESSION['OA2ORCBACKURL'])){
   $tmpOA2ORCBACKURL = $_SESSION['OA2ORCBACKURL'];
   unset($_SESSION['OA2ORCBACKURL']);
@@ -200,11 +200,19 @@ if(isset($_SESSION['OA2ORCBACKURL'])){
 else {
   $tmpOA2ORCBACKURL = $orcbackurl;
 }
+*/
 
-$agourl = parse_url($tmpOA2ORCBACKURL);
-parse_str($agourl['query'],$agoparms);
+// $agourl = parse_url($tmpOA2ORCBACKURL);
+$agourl = parse_url($orcbackurl);
+if(array_key_exists('query',$agourl)){
+  parse_str($agourl['query'],$agoparms);
+} else {
+  $agoparms = array();
+}
 
-header('Location: '.(array_key_exists('scheme',$agourl)?$agourl['scheme'].':':'').'//'.$agourl['host'].$agourl['path'].'?'.http_build_query(array_merge($agoparms,array(
+print_r($_SESSION);
+
+echo('Location: '.(array_key_exists('scheme',$agourl)?$agourl['scheme'].':':'').'//'.$agourl['host'].$agourl['path'].'?'.http_build_query(array_merge($agoparms,array(
 		'orcid' => $porcid ,
 		'nome' => $_SESSION['dadosusp']['nome']
       ))));
