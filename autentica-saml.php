@@ -40,7 +40,11 @@ else {
 	require_once('/var/simplesamlphp/lib/_autoload.php');
 	$as = new SimpleSAML_Auth_Simple('default-sp');
 
-	$as->requireAuth();
+	if(filter_input(INPUT_GET,'reauth') === 'yes'){	
+		$as->requireAuth(array('ForceAuthn' => true));
+	} else {
+		$as->requireAuth();
+	}
 
 	$dadosusp = $as->getAttributes();
 
