@@ -43,8 +43,8 @@ if(strlen(filter_input(INPUT_GET,'logout')) > 0){
 }
 else {
 
-	ini_set('session.save_handler','memcached');
-	ini_set('session.save_path',MEMCACHESRVR.':'.MEMCACHEPORT);
+	// ini_set('session.save_handler','memcached');
+	// ini_set('session.save_path',MEMCACHESRVR.':'.MEMCACHEPORT);
 	$kem = filter_input(INPUT_GET,'kem');
 	if(strlen($kem) > 0){
 		session_id($kem);

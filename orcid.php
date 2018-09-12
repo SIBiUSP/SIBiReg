@@ -10,8 +10,8 @@ header("Pragma: no-cache");
 [INICIO do trecho para que não se exija autenticação prévia via USP]
 if(strlen((string) filter_input(INPUT_GET,'code')) === 0) {
 	include('config.php');
-	ini_set('session.save_handler','memcached');
-	ini_set('session.save_path',MEMCACHESRVR.':'.MEMCACHEPORT);
+	// ini_set('session.save_handler','memcached');
+	// ini_set('session.save_path',MEMCACHESRVR.':'.MEMCACHEPORT);
 	$kem = filter_input(INPUT_GET,'kem');
 	if(!empty($kem)){
 		session_id($kem);
