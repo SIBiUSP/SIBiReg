@@ -22,22 +22,16 @@ if(isset($_SESSION['dadosusp']['nusp'])){
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 			<title></title>
 			<link rel="stylesheet" href="inc/uikit-2.27.1/css/uikit.min.css" />
-		<link rel="stylesheet" href="inc/style.css" />
+			<link rel="stylesheet" href="inc/style.css" />
 			<script src="inc/jquery-3.1.1.min.js"></script>
 			<script src="inc/uikit-2.27.1/js/uikit.min.js"></script>
 		</head>
 		<body>
 		  <?php include 'inc/header.inc' ?>
 				<h1>
-				Pesquisas ORCID-USP
+				Dashboard ORCID-USP
 				</h1>
-			<h6>
-			<a href='http://www.usp.br/orcid' target='_new'><i>ORCID - Universidade de São Paulo</i></a>
-			</h6>
-		<ul>
-		<li><a href="pesquisa-orcid-dashboard.php">ORCID - Novo Dashboard</a></li>
-		 <li><a href="pesquisa-orcid-tabela.php">ORCID - Antiga tabela</a></li>
-		</ul>
+				<iframe src="<?php echo KIBDASH; ?>" height="2500" width="95%"></iframe>
 		<br/>
 		<a href="autentica-oauth1.php?logout=pesquisa-inicio.php">sair</a>
 		<br/><br/><br/><br/><br/>

@@ -4,7 +4,7 @@
 	    <br/><br/>
         </center>
         <div class="barrausp"><p>&nbsp;<br/>&nbsp;<br/>&nbsp;</p></div>
-        <div class="uk-container uk-container-center uk-margin-large-bottom"/> <a href='index.php'>Registro SIBiUSP</a>
+        <div class="uk-container uk-container-center uk-margin-small"/> <a href='index.php'>Registro SIBiUSP</a>
 
 
 
