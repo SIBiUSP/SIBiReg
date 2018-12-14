@@ -114,6 +114,8 @@ if ( filter_input(INPUT_GET,'state') !== $_SESSION['oauth_state'] ) {
  exit('invalid state');
 }
 
+$pcodpes = $_SESSION['dadosusp']['nusp'];
+
 $curl = curl_init();
 curl_setopt_array($curl, array(
   CURLOPT_URL => OA2ORC_TOKEN_URL,
@@ -128,66 +130,72 @@ curl_setopt_array($curl, array(
   ))
 ));
 $result = curl_exec($curl);
+
+if(file_put_contents('../responses/'.$pcodpes.'_'.date("YmdHis").'.json',$result."\n") == 0){
+  if( filter_input(INPUT_SERVER,'REMOTE_ADDR') !== '200.144.210.114' ){
+
+    echo 'Desculpe o transtorno, site em manutenção.';
+    exit;
+  
+  }
+  else {
+    echo "Erro... \n";
+    echo getcwd();
+    exit;
+  }
+}
+
 $response = json_decode($result, true);
 
-$porcid =  $response['orcid'];
-
 /*============================*/
-
-$ptokacc = $response['access_token'];
-
-$pcodpes = $_SESSION['dadosusp']['nusp'];
-
-/*
-echo "<pre>\n";
-echo "B. olha o OA2ORC_TOKEN_URL:[".OA2ORC_TOKEN_URL."]\n";
-echo "B. olha o ORCID_PRODUCTION:[".ORCID_PRODUCTION."]\n";
-echo "B. olha a url post:[".http_build_query(array(
-    'code' => filter_input(INPUT_GET,'code'),
-    'grant_type' => 'authorization_code',
-    'client_id' => OA2ORC_CLIENT_ID,
-    'client_secret' => OA2ORC_CLIENT_SECRET
-  ))."]\n";
-echo "B. olha o ptokacc:[".$ptokacc."]\n";
-print_r($response);
-print_r($_SESSION);
-echo "\n</pre>";
-exit;
-*/
-
-/*============================*/
-
-$sqlqry = "BEGIN perfil_sibi.isola_identificador(:pcodpes,'ORCIDTOKACC',:ptokacc); END;";
 
 $conn = oci_connect(DBUSR, DBPWD, DBURL);
 
+/*============================*/
+
+$sqlqry=<<<EOF
+  BEGIN
+    perfil_sibi.isola_identificador(:pcodpes,'ORCIDTOKNAM',:ptoknam);
+    perfil_sibi.isola_identificador(:pcodpes,'ORCIDTOKCOP',:ptokcop);
+    perfil_sibi.isola_identificador(:pcodpes,'ORCIDTOKXPN',:ptokxpn);
+    perfil_sibi.isola_identificador(:pcodpes,'ORCIDTOKRFH',:ptokrfh);
+    perfil_sibi.isola_identificador(:pcodpes,'ORCIDTOKTYP',:ptoktyp);
+    perfil_sibi.isola_identificador(:pcodpes,'ORCIDTOKACC',:ptokacc);
+    :rpsres := perfil_sibi.agrega_identificador_orcid(:pcodpes,:porcid);
+  END;
+EOF;
+
 $stid = oci_parse($conn, $sqlqry);
 if(!$stid){ exit; }
 
 oci_bind_by_name($stid,':pcodpes',$pcodpes);
-oci_bind_by_name($stid,':ptokacc',$ptokacc);
+oci_bind_by_name($stid,':ptoknam',$response['name']);
+oci_bind_by_name($stid,':ptokcop',$response['scope']);
+oci_bind_by_name($stid,':ptokxpn',$response['expires_in']);
+oci_bind_by_name($stid,':ptokrfh',$response['refresh_token']);
+oci_bind_by_name($stid,':ptoktyp',$response['token_type']);
+oci_bind_by_name($stid,':ptokacc',$response['access_token']);
+oci_bind_by_name($stid,':porcid',$response['orcid']);
 
-oci_execute($stid,OCI_NO_AUTO_COMMIT);
-
-/*============================*/
-/*============================*/
-
-$sqlqry = "BEGIN :rpsres := perfil_sibi.agrega_identificador_orcid(:pcodpes,:porcid); END;";
-
-$stid = oci_parse($conn, $sqlqry);
-if(!$stid){ exit; }
-
-$pcodpes = $_SESSION['dadosusp']['nusp'];
 $rpsres = '';
-oci_bind_by_name($stid,':pcodpes',$pcodpes);
-oci_bind_by_name($stid,':porcid',$porcid);
 oci_bind_by_name($stid,':rpsres',$rpsres,2000,SQLT_CHR);
 
-oci_execute($stid,OCI_NO_AUTO_COMMIT);
+$r = oci_execute($stid,OCI_NO_AUTO_COMMIT);
+if (!$r) {
+  $e = oci_error($stid);
+  trigger_error(htmlentities($e['message']), E_USER_ERROR);
+  exit;
+}
 
 /*============================*/
 
-oci_commit($conn);
+$r = oci_commit($conn);
+if (!$r) {
+  $e = oci_error($stid);
+  trigger_error(htmlentities($e['message']), E_USER_ERROR);
+  exit;
+}
+
 
 oci_free_statement($stid);
 oci_close($conn);
