@@ -37,6 +37,10 @@ if( filter_input(INPUT_SERVER,'REMOTE_ADDR') !== '200.144.210.114' ){
 }
 */
 
+putenv("NLS_SORT=BINARY_AI");
+putenv("NLS_COMP=LINGUISTIC");
+putenv("NLS_LANG=BRAZILIAN PORTUGUESE_BRAZIL.UTF8");
+
 $kem = session_id();
 
 if(array_key_exists('real_redirect', $_SESSION) && (strlen($_SESSION['real_redirect']) > 0)  && ($_SESSION['real_redirect'] !== 'https://www.sibi.usp.br/sibireg/orcid.php')){

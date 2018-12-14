@@ -11,6 +11,7 @@ include('config.php');
 
 putenv("NLS_SORT=BINARY_AI");
 putenv("NLS_COMP=LINGUISTIC");
+putenv("NLS_LANG=BRAZILIAN PORTUGUESE_BRAZIL.UTF8");
 
 if(isset($_SESSION['dadosusp']['nusp'])){
 

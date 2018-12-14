@@ -12,11 +12,11 @@ header("Pragma: no-cache");
 include('autentica-oauth1.php');
 include('config.php');
 
-include('pesquisa-geral_pesquisas.php');
-
 putenv("NLS_SORT=BINARY_AI");
 putenv("NLS_COMP=LINGUISTIC");
 putenv("NLS_LANG=BRAZILIAN PORTUGUESE_BRAZIL.UTF8");
+
+include('pesquisa-geral_pesquisas.php');
 
 foreach($_GET as $k => $v){
   $_SESSION[$k] = html_entity_decode($v);

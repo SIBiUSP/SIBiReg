@@ -131,29 +131,25 @@ function exibe_armazena_conteudo(){
 <?php
 }
 
+if(!isset($_SESSION['oa1usp_dadosusp']->vinculo)){
+	unset($_SESSION['dadosusp']);
+	header("Refresh:0");
+	exit;
+}
 
-    if(!isset($_SESSION['oa1usp_dadosusp']->vinculo)){
-		echo "usuário não autenticado!";
-		if($viewlayout == 'html'){
-			echo "</body></html>";
-		}
-        exit;
-    }
-   
-   foreach($_SESSION['oa1usp_dadosusp']->vinculo as $k => $v){
-       // if(($v->tipoVinculo === 'SERVIDOR') && ($v->codigoUnidade === 69)){
-			$goahead = 1;
-       // }
-   }
-   
-   if($goahead === 0){
+foreach($_SESSION['oa1usp_dadosusp']->vinculo as $k => $v){
+	if(($v->tipoVinculo === 'SERVIDOR') && ($v->codigoUnidade === 69)){
+		$goahead = 1;
+	}
+}
+
+if($goahead == 0){
 	echo "usuário não habilitado para realizar esta consulta";
 	if($viewlayout == 'html'){
 		echo "</body></html>";
 	}
-    exit;
-   }
-
+	exit;
+}
 
 if($viewlayout == 'html'){
 ?>
