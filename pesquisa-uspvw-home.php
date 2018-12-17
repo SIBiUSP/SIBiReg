@@ -62,9 +62,9 @@ if(array_key_exists('q',$_GET) && strlen($_GET['q'])>0){
 <?php
 
 if(!isset($_SESSION['oa1usp_dadosusp']->vinculo)){
- echo "usuário não autenticado!";
- echo "</body></html>";
- exit;
+	unset($_SESSION['dadosusp']);
+	header("Refresh:0");
+	exit;
 }
 
 $goahead = 0;
