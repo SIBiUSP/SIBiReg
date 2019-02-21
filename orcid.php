@@ -225,7 +225,7 @@ if(array_key_exists('query',$agourl)){
 // print_r($_SESSION);
 
 header('Location: '.(array_key_exists('scheme',$agourl)?$agourl['scheme'].':':'').'//'.$agourl['host'].$agourl['path'].'?'.http_build_query(array_merge($agoparms,array(
-		'orcid' => $porcid ,
+		'orcid' => $response['orcid'] ,
 		'nome' => $_SESSION['dadosusp']['nome']
       ))));
 
