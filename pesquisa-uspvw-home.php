@@ -5,6 +5,8 @@
 * alterado em 27/mar/2017
 */
 
+define('DEBUGIT',0);
+
 header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
@@ -31,7 +33,7 @@ if(array_key_exists('q',$_GET) && strlen($_GET['q'])>0){
 
 ?>
 <html>
-<head><title>USP - SIBi</title>
+<head><title>USP - AGUIA</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <style>
 	* {
@@ -84,11 +86,10 @@ if($goahead === 0){
 
 
 <!-- #FCB421 --><!-- #FCB421 -->
-<div style="background: url('bgusp.png') repeat-x fixed left top; padding: 5px;">
-<!--span style="font-size:20px;color:#3F3F3F;font-weight:bold">busc</span-->
+<div style="background: url('bgusp.png') repeat-x left top; padding: 5px;">
 <span style="font-size:20px;color:#1694AB;font-weight:bold">USP</span>
 <br>
-<span style="font-size:18px;color:white;font-weight:bold">SIBi</span>
+<span style="font-size:18px;color:white;font-weight:bold">AGUIA</span>
 </div>
 <br>
 <form method="get" accept-charset="UTF-8">
@@ -200,7 +201,8 @@ exit;
 	$sqlstrf = array();
 	$asqlqry = array();
 	$a_binds = array();
-	$licount = 7; // quantidade de critérios
+	// $licount = 7; // quantidade de critérios
+	$licount = 2; // quantidade de critérios
 	$totlins = 0;
 	
 	for($licrit=0;$licrit<$licount;$licrit++){
@@ -218,88 +220,14 @@ exit;
 								unset($bindxpr);
 								break;
 						
-						case 1: if(count($collabel['where'])>2 && count($collabel['where'])<5){
+						case 1: if(count($collabel['where'])>0 && count($collabel['where'])<5){
 									$bindvar = ":".$collabel['label'].'_'.$licrit;
-									$bindxpr = "regexp_like(".$collabel['name'].",".$bindvar.")";
+									$bindxpr = "regexp_like(".$collabel['name'].",".$bindvar.",'i')";
 									array_push($al_qry,$bindxpr);
-									$a_binds[$bindvar] = '^'.implode('\S*?\s+?',$collabel['where']).'\S*$';
+									$a_binds[$bindvar] = '.*'.implode('.+',$collabel['where']).'.*';
 									unset($bindvar);
 									unset($bindxpr);
 								}
-								break;
-						
-						case 2: if(count($collabel['where'])>2 && count($collabel['where'])<5){
-									$al_tmp = array();
-									$i=0;
-									$bindvar='';
-									foreach(quickperm($collabel['where']) as $rot_tmp){
-										if($i>0){
-											$bindvar = ":".$collabel['label'].'_'.$i.'_'.$licrit;
-											array_push($al_tmp,"regexp_like(".$collabel['name'].",".$bindvar.")");
-											$a_binds[$bindvar] = '^'.implode('\S*?\s+?',$rot_tmp).'\S+$';
-										}
-										$i++;
-									}
-									if(count($al_tmp)>0) {
-										$bindxpr='('.implode(' OR ',$al_tmp).')';
-										array_push($al_qry,$bindxpr);
-									}
-									unset($al_tmp);
-									unset($rot_tmp);
-									unset($bindvar);
-									unset($bindxpr);
-									unset($i);
-								}
-								break;
-								
-						case 3: if(count($collabel['where'])>2){
-									$rot_tmp = array_merge(array(),$collabel['where']);
-									array_push($rot_tmp,array_shift($rot_tmp));
-									$bindvar = ":".$collabel['label'].'_'.$licrit;
-									$bindxpr = $collabel['name']." like ".$bindvar;
-									array_push($al_qry,$bindxpr);
-									$a_binds[$bindvar] = implode('% ',$rot_tmp);
-									unset($rot_tmp);
-									unset($bindvar);
-									unset($bindxpr);
-								}
-								break;
-								
-						case 4: if(count($collabel['where'])>2){
-									$rot_tmp = array_merge(array(),$collabel['where']);
-									array_push($rot_tmp,array_shift($rot_tmp));
-									$bindvar = ":".$collabel['label'].'_'.$licrit;
-									$bindxpr = $collabel['name']." like ".$bindvar;
-									array_push($al_qry,$bindxpr);
-									$a_binds[$bindvar] = implode('%',$rot_tmp);
-									unset($rot_tmp);
-									unset($bindvar);
-									unset($bindxpr);
-								}
-								break;
-						
-						case 5: for($i=0; $i<count($collabel['where']); $i++){
-									$bindvar1=':'.$collabel['label'].'_s_'.$i.'_'.$licrit;
-									$bindvar2=':'.$collabel['label'].'_n_'.$i.'_'.$licrit;
-									array_push($al_qry,"(".$collabel['name']." like ".$bindvar1." OR ".$collabel['name']." like ".$bindvar2.")");
-									$a_binds[$bindvar1] = $collabel['where'][$i].'%';
-									$a_binds[$bindvar2] = '% '.$collabel['where'][$i].'%';
-								}
-								unset($bindvar1);
-								unset($bindvar2);
-								unset($bindxpr);
-								unset($i);
-								break;
-								
-						case 6: for($i=0; $i<count($collabel['where']); $i++){
-									$bindvar=':'.$collabel['label'].'_'.$i.'_'.$licrit;
-									$bindxpr= $collabel['name']." like ".$bindvar;
-									array_push($al_qry,$bindxpr);
-									$a_binds[$bindvar] = '%'.$collabel['where'][$i].'%';
-								}
-								unset($bindvar);
-								unset($bindxpr);
-								unset($i);
 								break;
 					}
 				}
@@ -402,7 +330,7 @@ RECHECK
 }
 
 ?>
-<span>busca de pessoas na base replicada da USP para SIBi - seu IP.: <?=get_client_ip()?></span>
+<span>busca de pessoas na base replicada da USP para AGUIA - seu IP.: <?=get_client_ip()?></span>
 <br><br>
 * obs: <br>
 1. a busca se dará por padrão na coluna do nome da pessoa (<b>NOMPES</b>);<br>
@@ -429,24 +357,39 @@ function fsqltabletr($t_sqlryf,$t_conn,$abinds,$qcols){
 		oci_bind_by_name($stid, $kbind, $abinds[$kbind]) or print_r('<BR>\n['.'olha isso:'.$kbind.' -> '.$abinds[$kbind].']');
 	}
 
-	$r=oci_execute($stid) or print_r($t_sqlryf);
-	if(!$r){ exit; }
 
-	while ($row = oci_fetch_array($stid, OCI_ASSOC+OCI_RETURN_NULLS)) {
-		$totlins++;
-		if($totlins <= MAX_ROWNUM){
-			print "<tr>\n";
-			print "<td>".$totlins."</td>\n";
-			$i=0;
-			foreach ($row as $item) {
-				$i++;
-				print "    <td>" . ($item !== null ? htmlentities($item, ENT_QUOTES) : "&nbsp;") . "</td>\n";
-				$ret = true;
-				if($i >= $qcols) break;
-			}
-			print "</tr>\n";
-		}
+	if(DEBUGIT === 1){
+
+		print("<tr>\n<td>\n");
+		print("<xmp>\n"); print_r($abinds); print("</xmp>\n");
+		print("</td>\n<td colspan=".($qcols-1).">\n");
+		print("<xmp>\n"); print_r($t_sqlryf); print("</xmp>\n");
+		print("</td>\n</tr>\n");
+
 	}
+	else {
+
+		$r=oci_execute($stid) or print_r($t_sqlryf);
+		if(!$r){ exit; }
+
+		while ($row = oci_fetch_array($stid, OCI_ASSOC+OCI_RETURN_NULLS)) {
+			$totlins++;
+			if($totlins <= MAX_ROWNUM){
+				print "<tr>\n";
+				print "<td>".$totlins."</td>\n";
+				$i=0;
+				foreach ($row as $item) {
+					$i++;
+					print "    <td>" . ($item !== null ? htmlentities($item, ENT_QUOTES) : "&nbsp;") . "</td>\n";
+					$ret = true;
+					if($i >= $qcols) break;
+				}
+				print "</tr>\n";
+			}
+		}
+
+	}
+
 	
 	oci_free_statement($stid);
 	
